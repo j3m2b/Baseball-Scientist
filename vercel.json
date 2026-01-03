@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/research",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 8 * * *"  // Every day at 8AM UTC (adjust time as needed)
     }
   ]
 }
