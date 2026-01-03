@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatTimeAgo } from '@/lib/utils';
-import { FlaskConical, TrendingUp, LineChart, Clock } from 'lucide-react';
+import { FlaskConical, TrendingUp, LineChart, Clock, Play, AlertCircle, CheckCircle } from 'lucide-react';
 import { ProbabilityChart } from './probability-chart';
 
 interface Experiment {
@@ -57,6 +57,11 @@ interface LatestData {
 export function ResearchFeed() {
   const [latestData, setLatestData] = useState<LatestData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [triggering, setTriggering] = useState(false);
+  const [triggerError, setTriggerError] = useState<string | null>(null);
+  const [triggerSuccess, setTriggerSuccess] = useState<string | null>(null);
+  const [secretInput, setSecretInput] = useState('');
+  const [showSecretInput, setShowSecretInput] = useState(false);
 
   useEffect(() => {
     fetchLatestData();
@@ -98,6 +103,43 @@ export function ResearchFeed() {
     };
   }
 
+  async function triggerResearch() {
+    if (!secretInput.trim()) {
+      setTriggerError('Please enter your cron secret');
+      return;
+    }
+
+    setTriggering(true);
+    setTriggerError(null);
+    setTriggerSuccess(null);
+
+    try {
+      const response = await fetch('/api/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret: secretInput.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to trigger research');
+      }
+
+      setTriggerSuccess(`Research cycle #${data.experimentId.slice(0, 8)} started! Check back in a minute.`);
+      setSecretInput('');
+
+      // Refresh data after a short delay
+      setTimeout(() => {
+        fetchLatestData();
+      }, 3000);
+    } catch (error) {
+      setTriggerError(error instanceof Error ? error.message : 'Failed to trigger research');
+    } finally {
+      setTriggering(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -112,13 +154,66 @@ export function ResearchFeed() {
   if (!latestData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Card className="max-w-md">
+        <Card className="max-w-md w-full mx-4">
           <CardHeader>
-            <CardTitle>No Research Yet</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <FlaskConical className="h-5 w-5" />
+              No Research Yet
+            </CardTitle>
             <CardDescription>
               The Auto-Baseball-Scientist hasn't run its first experiment yet.
             </CardDescription>
           </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Cron Secret</label>
+              <input
+                type="password"
+                placeholder="Enter your CRON_SECRET..."
+                value={secretInput}
+                onChange={(e) => setSecretInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && triggerResearch()}
+                disabled={triggering}
+                className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+
+            {triggerError && (
+              <div className="flex items-center gap-2 text-sm text-red-500 bg-red-50 dark:bg-red-950/20 p-3 rounded-lg">
+                <AlertCircle className="h-4 w-4" />
+                {triggerError}
+              </div>
+            )}
+
+            {triggerSuccess && (
+              <div className="flex items-center gap-2 text-sm text-green-500 bg-green-50 dark:bg-green-950/20 p-3 rounded-lg">
+                <CheckCircle className="h-4 w-4" />
+                {triggerSuccess}
+              </div>
+            )}
+
+            <button
+              onClick={triggerResearch}
+              disabled={triggering}
+              className="w-full inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+            >
+              {triggering ? (
+                <>
+                  <FlaskConical className="h-4 w-4 mr-2 animate-pulse" />
+                  Running Research Cycle...
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4 mr-2" />
+                  Run First Research Cycle
+                </>
+              )}
+            </button>
+
+            <p className="text-xs text-muted-foreground text-center">
+              This will call Claude 4.5 to analyze MLB data and generate hypotheses
+            </p>
+          </CardContent>
         </Card>
       </div>
     );
@@ -128,12 +223,74 @@ export function ResearchFeed() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Auto-Baseball-Scientist</h1>
-        <p className="text-muted-foreground">
-          Live Research Feed — 2026 MLB Off-Season Analysis
-        </p>
+      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-4xl font-bold mb-2">Auto-Baseball-Scientist</h1>
+          <p className="text-muted-foreground">
+            Live Research Feed — 2026 MLB Off-Season Analysis
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {showSecretInput && (
+            <div className="flex items-center gap-2">
+              <input
+                type="password"
+                placeholder="CRON_SECRET"
+                value={secretInput}
+                onChange={(e) => setSecretInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') triggerResearch();
+                }}
+                disabled={triggering}
+                className="w-40 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+          )}
+          <button
+            onClick={() => {
+              if (!showSecretInput) {
+                setShowSecretInput(true);
+              } else {
+                triggerResearch();
+              }
+            }}
+            disabled={triggering}
+            className={`inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 ${
+              showSecretInput
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'border border-input bg-background hover:bg-accent hover:text-accent-foreground'
+            }`}
+          >
+            {triggering ? (
+              <>
+                <FlaskConical className="h-4 w-4 mr-2 animate-pulse" />
+                Running...
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Run New Cycle
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Show success/error messages at the top */}
+      {triggerError && (
+        <div className="mb-4 flex items-center gap-2 text-sm text-red-500 bg-red-50 dark:bg-red-950/20 p-3 rounded-lg">
+          <AlertCircle className="h-4 w-4" />
+          {triggerError}
+        </div>
+      )}
+
+      {triggerSuccess && (
+        <div className="mb-4 flex items-center gap-2 text-sm text-green-500 bg-green-50 dark:bg-green-950/20 p-3 rounded-lg">
+          <CheckCircle className="h-4 w-4" />
+          {triggerSuccess}
+        </div>
+      )}
 
       <Tabs defaultValue="activity" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-flex">
