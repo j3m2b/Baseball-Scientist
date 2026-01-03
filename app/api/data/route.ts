@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 
 export async function GET() {
-  const supabase = supabaseServer;  // supabaseServer is the client instance (no ())
+  const supabase = supabaseServer;
 
   // Get the latest experiment
   const { data: latestExperiment, error: expError } = await supabase
@@ -16,8 +16,8 @@ export async function GET() {
     return NextResponse.json({ error: 'No experiments found' }, { status: 404 });
   }
 
-  // Extract ID after check (TS now knows it's defined)
-  const experimentId = latestExperiment.id;
+  // Use non-null assertion (!) since we checked !latestExperiment above — TS should narrow but sometimes needs help with Supabase types
+  const experimentId = latestExperiment!.id;
 
   // Get related data
   const { data: hypotheses } = await supabase
