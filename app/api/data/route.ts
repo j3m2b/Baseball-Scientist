@@ -1,23 +1,26 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import type { Database } from '@/lib/supabase/types';
+
+type Experiment = Database['public']['Tables']['experiments']['Row'];
 
 export async function GET() {
   const supabase = supabaseServer;
 
   // Get the latest experiment
-  const { data: latestExperiment, error: expError } = await supabase
+  const result = await supabase
     .from('experiments')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(1)
     .single();
 
-  if (expError || !latestExperiment) {
+  const experiment = result.data as Experiment | null;
+  if (!experiment) {
     return NextResponse.json({ error: 'No experiments found' }, { status: 404 });
   }
 
-  // Use non-null assertion (!) since we checked !latestExperiment above — TS should narrow but sometimes needs help with Supabase types
-  const experimentId = latestExperiment!.id;
+  const experimentId = experiment.id;
 
   // Get related data
   const { data: hypotheses } = await supabase
@@ -38,7 +41,7 @@ export async function GET() {
     .eq('experiment_id', experimentId);
 
   return NextResponse.json({
-    experiment: latestExperiment,
+    experiment: experiment,
     hypotheses: hypotheses || [],
     insights: insights || [],
     probabilities: probabilities || [],
