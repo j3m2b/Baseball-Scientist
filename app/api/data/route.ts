@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 
 export async function GET() {
-  const supabase = supabaseServer;  // Removed () — supabaseServer is the client, not a function
+  const supabase = supabaseServer;  // supabaseServer is the client instance (no ())
 
   // Get the latest experiment
   const { data: latestExperiment, error: expError } = await supabase
@@ -16,23 +16,26 @@ export async function GET() {
     return NextResponse.json({ error: 'No experiments found' }, { status: 404 });
   }
 
+  // Extract ID after check (TS now knows it's defined)
+  const experimentId = latestExperiment.id;
+
   // Get related data
   const { data: hypotheses } = await supabase
     .from('hypotheses')
     .select('*')
-    .eq('experiment_id', latestExperiment.id)
+    .eq('experiment_id', experimentId)
     .order('created_at', { ascending: false });
 
   const { data: insights } = await supabase
     .from('insights')
     .select('*')
-    .eq('experiment_id', latestExperiment.id)
+    .eq('experiment_id', experimentId)
     .order('created_at', { ascending: false });
 
   const { data: probabilities } = await supabase
     .from('team_probabilities')
     .select('*')
-    .eq('experiment_id', latestExperiment.id);
+    .eq('experiment_id', experimentId);
 
   return NextResponse.json({
     experiment: latestExperiment,
