@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const secret = searchParams.get('secret');
   if (secret !== process.env.CRON_SECRET) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const supabase = supabaseServer();
+  const supabase = supabaseServer;
 
   // Fetch last 10 cycles for reflection
   const { data: pastExps } = await supabase
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     .order('created_at', { ascending: false })
     .limit(10);
 
-  const expIds = pastExps?.map(e => e.id) || [];
+  const expIds = pastExps?.map((e: any) => e.id) || [];
 
   const { data: pastHyps } = await supabase
     .from('hypotheses')
@@ -43,13 +43,13 @@ export async function GET(request: NextRequest) {
   let historyContext = 'No previous research cycles yet.';
   if (pastExps && pastExps.length > 0) {
     historyContext = '### Previous Research Cycles (for reflection only):\n\n';
-    pastExps.forEach((exp, i) => {
-      const hyps = pastHyps?.filter(h => h.experiment_id === exp.id) || [];
-      const probs = pastProbs?.filter(p => p.experiment_id === exp.id).slice(0, 6) || [];
+    pastExps.forEach((exp: any, i: number) => {
+      const hyps = pastHyps?.filter((h: any) => h.experiment_id === exp.id) || [];
+      const probs = pastProbs?.filter((p: any) => p.experiment_id === exp.id).slice(0, 6) || [];
       historyContext += `Cycle ${pastExps.length - i} (${new Date(exp.created_at).toLocaleDateString()}):\n`;
       historyContext += `${exp.title}\n${exp.summary}\n`;
-      historyContext += `Key Hypotheses: ${hyps.map(h => `${h.hypothesis} (${h.isValidated ? '✓' : '✗'}, Surprise ${h.surpriseLevel})`).join('; ') || 'None'}\n`;
-      historyContext += `Top Teams: ${probs.map(p => `${p.teamName} ${p.probability}%`).join(', ') || 'None'}\n\n`;
+      historyContext += `Key Hypotheses: ${hyps.map((h: any) => `${h.hypothesis} (${h.isValidated ? '✓' : '✗'}, Surprise ${h.surpriseLevel})`).join('; ') || 'None'}\n`;
+      historyContext += `Top Teams: ${probs.map((p: any) => `${p.teamName} ${p.probability}%`).join(', ') || 'None'}\n\n`;
     });
   }
 
