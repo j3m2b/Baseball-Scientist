@@ -3,6 +3,97 @@ import Anthropic from '@anthropic-ai/sdk';
 import { supabaseServer } from '@/lib/supabase/server';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import type { Database } from '@/lib/supabase/types';
+
+// Team code mapping for MLB teams
+const TEAM_CODES: Record<string, string> = {
+  'Diamondbacks': 'ARI',
+  'Braves': 'ATL',
+  'Orioles': 'BAL',
+  'Red Sox': 'BOS',
+  'Cubs': 'CHC',
+  'White Sox': 'CWS',
+  'Reds': 'CIN',
+  'Guardians': 'CLE',
+  'Rockies': 'COL',
+  'Tigers': 'DET',
+  'Astros': 'HOU',
+  'Royals': 'KCR',
+  'Angels': 'LAA',
+  'Dodgers': 'LAD',
+  'Marlins': 'MIA',
+  'Brewers': 'MIL',
+  'Twins': 'MIN',
+  'Mets': 'NYM',
+  'Yankees': 'NYY',
+  'Athletics': 'OAK',
+  'Phillies': 'PHI',
+  'Pirates': 'PIT',
+  'Padres': 'SD',
+  'Giants': 'SF',
+  'Mariners': 'SEA',
+  'Cardinals': 'STL',
+  'Rays': 'TBR',
+  'Rangers': 'TEX',
+  'Blue Jays': 'TOR',
+  'Nationals': 'WSN'
+};
+
+// Simple XML parser - extracts content between tags
+function extractTagContent(xml: string, tag: string): string {
+  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
+  const match = xml.match(regex);
+  return match ? match[1].trim() : '';
+}
+
+// Extract all occurrences of a tag
+function extractRepeatedTags(xml: string, tag: string): string[] {
+  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gi');
+  const matches: string[] = [];
+  let match;
+  while ((match = regex.exec(xml)) !== null) {
+    matches.push(match[1].trim());
+  }
+  return matches;
+}
+
+// Parse surprise level (1-10) to category
+function parseSurpriseLevel(level: number): 'Low' | 'Medium' | 'High' {
+  if (level <= 3) return 'Low';
+  if (level <= 7) return 'Medium';
+  return 'High';
+}
+
+// Parse Claude's XML response into structured data
+function parseClaudeResponse(text: string) {
+  const experimentContent = extractTagContent(text, 'experiment');
+
+  // Parse experiment metadata
+  const title = extractTagContent(experimentContent, 'title');
+  const summary = extractTagContent(experimentContent, 'summary');
+
+  // Parse hypotheses
+  const hypothesisBlocks = extractRepeatedTags(experimentContent, 'hypothesis');
+  const hypotheses = hypothesisBlocks.map(block => ({
+    text: extractTagContent(block, 'text'),
+    isValidated: extractTagContent(block, 'isValidated').toLowerCase() === 'true',
+    surpriseLevel: parseSurpriseLevel(parseInt(extractTagContent(block, 'surpriseLevel')) || 5),
+    explanation: extractTagContent(block, 'explanation')
+  }));
+
+  // Parse team probabilities
+  const teamBlocks = extractRepeatedTags(experimentContent, 'team');
+  const teamProbabilities = teamBlocks.map(block => ({
+    name: extractTagContent(block, 'name'),
+    probability: parseFloat(extractTagContent(block, 'probability')),
+    change: parseFloat(extractTagContent(block, 'change') || '0')
+  }));
+
+  // Parse insights
+  const insights = extractRepeatedTags(experimentContent, 'insight');
+
+  return { title, summary, hypotheses, teamProbabilities, insights };
+}
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_AUTH_TOKEN || process.env.ANTHROPIC_API_KEY,
@@ -31,12 +122,12 @@ export async function GET(request: NextRequest) {
 
   const { data: pastHyps } = await supabase
     .from('hypotheses')
-    .select('hypothesis, isValidated, surpriseLevel, experiment_id')
+    .select('hypothesis, is_validated, surprise_level, experiment_id')
     .in('experiment_id', expIds);
 
   const { data: pastProbs } = await supabase
     .from('team_probabilities')
-    .select('teamName, probability, experiment_id')
+    .select('team_name, probability, experiment_id')
     .in('experiment_id', expIds);
 
   // Format history
@@ -48,8 +139,8 @@ export async function GET(request: NextRequest) {
       const probs = pastProbs?.filter((p: any) => p.experiment_id === exp.id).slice(0, 6) || [];
       historyContext += `Cycle ${pastExps.length - i} (${new Date(exp.created_at).toLocaleDateString()}):\n`;
       historyContext += `${exp.title}\n${exp.summary}\n`;
-      historyContext += `Key Hypotheses: ${hyps.map((h: any) => `${h.hypothesis} (${h.isValidated ? '✓' : '✗'}, Surprise ${h.surpriseLevel})`).join('; ') || 'None'}\n`;
-      historyContext += `Top Teams: ${probs.map((p: any) => `${p.teamName} ${p.probability}%`).join(', ') || 'None'}\n\n`;
+      historyContext += `Key Hypotheses: ${hyps.map((h: any) => `${h.hypothesis} (${h.is_validated ? '✓' : '✗'}, Surprise ${h.surprise_level})`).join('; ') || 'None'}\n`;
+      historyContext += `Top Teams: ${probs.map((p: any) => `${p.team_name} ${p.probability}%`).join(', ') || 'None'}\n\n`;
     });
   }
 
@@ -66,11 +157,124 @@ export async function GET(request: NextRequest) {
 
     const text = response.content[0].type === 'text' ? response.content[0].text : '';
 
-    // Your existing parseClaudeResponse + Supabase insert logic here (unchanged)
+    if (!text) {
+      return NextResponse.json({ error: 'Empty response from Claude' }, { status: 500 });
+    }
 
-    return NextResponse.json({ success: true });
+    // Parse the XML response
+    const parsed = parseClaudeResponse(text);
+
+    // Validate parsed data
+    if (!parsed.title || !parsed.summary) {
+      console.error('Failed to parse experiment:', { parsed, rawText: text });
+      return NextResponse.json({ error: 'Failed to parse Claude response' }, { status: 500 });
+    }
+
+    // Get next experiment number
+    const lastExpResult = await supabase
+      .from('experiments')
+      .select('experiment_number')
+      .order('experiment_number', { ascending: false })
+      .limit(1)
+      .single();
+
+    const lastExp = lastExpResult.data as { experiment_number: number } | null;
+    const nextExperimentNumber = (lastExp?.experiment_number ?? 0) + 1;
+
+    // Create experiment record
+    const expResult = await supabase
+      .from('experiments')
+      .insert({
+        experiment_number: nextExperimentNumber,
+        title: parsed.title,
+        summary: parsed.summary
+      } as any)
+      .select('id')
+      .single();
+
+    const experiment = expResult.data as { id: string } | null;
+    if (expResult.error || !experiment) {
+      console.error('Failed to create experiment:', expResult.error);
+      return NextResponse.json({ error: 'Failed to create experiment' }, { status: 500 });
+    }
+
+    const experimentId = experiment.id;
+
+    // Insert hypotheses
+    if (parsed.hypotheses.length > 0) {
+      const hypothesesToInsert = parsed.hypotheses.map(h => ({
+        experiment_id: experimentId,
+        hypothesis: h.text,
+        is_validated: h.isValidated,
+        evidence: h.explanation,
+        surprise_level: h.surpriseLevel
+      }));
+
+      const { error: hypError } = await supabase
+        .from('hypotheses')
+        .insert(hypothesesToInsert as any);
+
+      if (hypError) {
+        console.error('Failed to insert hypotheses:', hypError);
+        // Cleanup: delete experiment on failure
+        await supabase.from('experiments').delete().eq('id', experimentId);
+        return NextResponse.json({ error: 'Failed to save hypotheses' }, { status: 500 });
+      }
+    }
+
+    // Calculate and insert team probabilities with rankings
+    if (parsed.teamProbabilities.length > 0) {
+      // Sort by probability descending and assign ranks
+      const sortedTeams = [...parsed.teamProbabilities].sort((a, b) => b.probability - a.probability);
+
+      const probabilitiesToInsert = sortedTeams.map((t, index) => ({
+        experiment_id: experimentId,
+        team_code: TEAM_CODES[t.name] || t.name.slice(0, 3).toUpperCase(),
+        team_name: t.name,
+        probability: t.probability,
+        rank: index + 1,
+        change_from_previous: t.change
+      }));
+
+      const { error: probError } = await supabase
+        .from('team_probabilities')
+        .insert(probabilitiesToInsert as any);
+
+      if (probError) {
+        console.error('Failed to insert probabilities:', probError);
+        // Cleanup: delete experiment and hypotheses on failure
+        await supabase.from('experiments').delete().eq('id', experimentId);
+        return NextResponse.json({ error: 'Failed to save probabilities' }, { status: 500 });
+      }
+    }
+
+    // Insert insights
+    if (parsed.insights.length > 0) {
+      const insightsToInsert = parsed.insights.map(insight => ({
+        experiment_id: experimentId,
+        insight: insight,
+        details: '' // Schema requires details but we only have brief insights
+      }));
+
+      const { error: insError } = await supabase
+        .from('insights')
+        .insert(insightsToInsert as any);
+
+      if (insError) {
+        console.error('Failed to insert insights:', insError);
+        // Don't fail on insights error, just log it
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      experimentId,
+      title: parsed.title,
+      hypothesesCount: parsed.hypotheses.length,
+      insightsCount: parsed.insights.length
+    });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+    console.error('Research cycle error:', error);
+    return NextResponse.json({ error: 'Failed to run research cycle' }, { status: 500 });
   }
 }
