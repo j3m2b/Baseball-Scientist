@@ -1,70 +1,43 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase/client';
+import { supabaseServer } from '@/lib/supabase/server';
 
 export async function GET() {
-  try {
-    // Fetch latest experiment with all related data
-    const { data: experiments, error: expError } = await supabase
-      .from('experiments')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10);
+  const supabase = supabaseServer();
 
-    if (expError) throw expError;
+  // Get the latest experiment
+  const { data: latestExperiment, error: expError } = await supabase
+    .from('experiments')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();  // Added .single() to return a single object (fixes TS error)
 
-    if (!experiments || experiments.length === 0) {
-      return NextResponse.json({
-        experiments: [],
-        latest: null,
-      });
-    }
-
-    const latestExperiment = experiments[0];
-
-    // Fetch related data for latest experiment
-    const [
-      { data: hypotheses },
-      { data: insights },
-      { data: teamProbabilities },
-      { data: nextExperiments },
-    ] = await Promise.all([
-      supabase
-        .from('hypotheses')
-        .select('*')
-        .eq('experiment_id', latestExperiment.id)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('insights')
-        .select('*')
-        .eq('experiment_id', latestExperiment.id)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('team_probabilities')
-        .select('*')
-        .eq('experiment_id', latestExperiment.id)
-        .order('rank', { ascending: true }),
-      supabase
-        .from('next_experiments')
-        .select('*')
-        .eq('experiment_id', latestExperiment.id)
-        .order('created_at', { ascending: false }),
-    ]);
-
-    return NextResponse.json({
-      experiments,
-      latest: {
-        experiment: latestExperiment,
-        hypotheses: hypotheses || [],
-        insights: insights || [],
-        teamProbabilities: teamProbabilities || [],
-        nextExperiments: nextExperiments || [],
-      },
-    });
-  } catch (error) {
-    console.error('Data fetch error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch data', details: String(error) },
-      { status: 500 }
-    );
+  if (expError || !latestExperiment) {
+    return NextResponse.json({ error: 'No experiments found' }, { status: 404 });
   }
+
+  // Get related data
+  const { data: hypotheses } = await supabase
+    .from('hypotheses')
+    .select('*')
+    .eq('experiment_id', latestExperiment.id)
+    .order('created_at', { ascending: false });
+
+  const { data: insights } = await supabase
+    .from('insights')
+    .select('*')
+    .eq('experiment_id', latestExperiment.id)
+    .order('created_at', { ascending: false });
+
+  const { data: probabilities } = await supabase
+    .from('team_probabilities')
+    .select('*')
+    .eq('experiment_id', latestExperiment.id);
+
+  return NextResponse.json({
+    experiment: latestExperiment,
+    hypotheses: hypotheses || [],
+    insights: insights || [],
+    probabilities: probabilities || [],
+  });
 }
