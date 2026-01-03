@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 
 export async function GET() {
-  const supabase = supabaseServer();
+  const supabase = supabaseServer;  // Removed () — supabaseServer is the client, not a function
 
   // Get the latest experiment
   const { data: latestExperiment, error: expError } = await supabase
@@ -10,7 +10,7 @@ export async function GET() {
     .select('*')
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();  // Added .single() to return a single object (fixes TS error)
+    .single();
 
   if (expError || !latestExperiment) {
     return NextResponse.json({ error: 'No experiments found' }, { status: 404 });
