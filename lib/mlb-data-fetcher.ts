@@ -28,286 +28,610 @@ export async function fetchMLBData(): Promise<string> {
 }
 
 /**
- * Curated MLB data for CURRENT 2025-2026 offseason
- * Date: January 4, 2026 - Analyzing moves for upcoming 2026 season
+ * COMPREHENSIVE MLB Data for 2025-2026 Offseason
+ * Date: January 4, 2026
  *
- * Timeline Context:
- * - December 2024: Roki Sasaki signed with Dodgers
- * - 2025 Season: Just completed (April-October 2025)
- * - Current: 2025-2026 Offseason (November 2025 - March 2026)
- * - Next: 2026 Season begins April 2026
+ * Timeline:
+ * - 2025 Season: April-October 2025 (JUST COMPLETED)
+ * - Current: 2025-2026 Offseason (Nov 2025 - March 2026)
+ * - Next Season: 2026 (starts April 2026)
  *
- * TODO: Replace with automated API calls to:
- * - ESPN API: http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news
- * - MLB Stats API: https://statsapi.mlb.com/api/v1/transactions
- * - Sports betting APIs for live odds
+ * IMPORTANT: This data should be updated weekly during offseason
+ * TODO: Replace with live API integration from MLB Stats API, ESPN, etc.
  */
 async function getCuratedMLBData(year: number): Promise<string> {
-  // For CURRENT 2025-2026 offseason (January 2026)
   if (year === 2026) {
     return `
-### 2025-2026 MLB Offseason Analysis - January 4, 2026
-### Analyzing Moves for Upcoming 2026 Season
-### (2025 Season Just Ended in October 2025)
-
-#### 2025 Season Results Context:
-
-**World Series Champion:**
-- TBD based on your actual season data
-
-**Division Winners (2025):**
-- AL East: TBD
-- AL Central: TBD
-- AL West: TBD
-- NL East: TBD
-- NL Central: TBD
-- NL West: Dodgers (projected - with Ohtani, Yamamoto, Betts, Freeman, Roki Sasaki)
-
-**Key 2025 Season Storylines:**
-- Roki Sasaki's impressive rookie season with Dodgers (signed Dec 2024, played full 2025)
-- Shohei Ohtani's first year with Dodgers (hitting only - rehabbing from surgery)
-- Yoshinobu Yamamoto's MLB debut season with Dodgers
-- Aaron Judge continued dominance with Yankees
-- Ronald Acuña Jr. recovery from ACL injury
-
-#### Major Free Agent Signings (2025-2026 Offseason - IN PROGRESS):
-
-**Top Free Agents Still Available (January 2026):**
-- Corbin Burnes (SP) - Ace pitcher, Cy Young caliber
-- Blake Snell (SP) - Two-time Cy Young winner
-- Cody Bellinger (1B/OF) - Power bat with defensive versatility
-- Matt Chapman (3B) - Gold Glove defender
-- Jordan Montgomery (SP) - Postseason proven starter
-- Anthony Santander (OF) - Power hitter
-- Teoscar Hernández (OF) - Consistent run producer
-
-**Major Signings Completed (December 2025 - January 2026):**
-- **Juan Soto (OF) to Mets - 15 years, $765M** (record-breaking deal, December 2024)
-  • Largest contract in sports history
-  • Mets beat Yankees, Dodgers, Red Sox in bidding war
-  • Now entering 2nd year with Mets after strong 2025 debut
-- Josh Hader (CP) to Astros - 5 years, $95M (elite closer)
-- Sonny Gray (SP) to Cardinals - 3 years, $75M
-- Aaron Nola (SP) re-signed with Phillies - 7 years, $172M
-- Jung Hoo Lee (CF) to Giants - 6 years, $113M (KBO star)
-- Shota Imanaga (SP) to Cubs - 4 years, $53M (NPB import)
-- Eduardo Rodriguez (SP) to Diamondbacks - 4 years, $80M
-- Max Fried (SP) to Yankees - 8 years, $218M
-- Willy Adames (SS) to Giants - 7 years, $182M
-
-**Relievers Market:**
-- Robert Suarez, Jordan Hicks, Aroldis Chapman still available
-- Teams looking for late-innings help
-
-#### Notable Trades (2025-2026 Offseason):
-
-**Blockbuster Deals:**
-- Tyler Glasnow trade discussions (Rays shopping ace)
-- White Sox fire sale continues - Luis Robert Jr., Dylan Cease available
-- Marlins shopping Jazz Chisholm Jr., Sandy Alcantara
-- Rays considering trading key pieces to reset
-- Garrett Crochet (White Sox SP) drawing significant interest
-
-**Completed Trades:**
-- TBD - Major trades typically happen January-February
-- Watch: White Sox, Athletics, Marlins, Rays as sellers
-
-#### International Signings (Already Completed):
-
-**2024-2025 Offseason Signings (Now in 2nd Season):**
-- Roki Sasaki (Dodgers) - Signed Dec 2024, completed impressive rookie 2025 season
-  • Now entering 2nd year, proven MLB commodity
-  • Part of Dodgers' Japanese pitching core with Yamamoto
-- Yoshinobu Yamamoto (Dodgers) - 12 years, $325M (completed rookie year 2025)
-- Shota Imanaga (Cubs) - Strong rookie season, entering year 2
-- Jung Hoo Lee (Giants) - Adjusting to MLB, entering year 2
-
-**Current International Market:**
-- Roki Sasaki is NO LONGER a signing variable - he's an established Dodger
-- Limited high-profile international free agents for 2026
-- Focus on international amateur market (July 2026 signing period)
-
-#### Key Injuries & Player Status for 2026:
-
-**Returning from 2025 Injuries:**
-- Shohei Ohtani (Dodgers) - Expected to pitch in 2026 (rehabbing from 2nd Tommy John)
-  • Full-time DH in 2025, targeting mid-2026 return to mound
-- Ronald Acuña Jr. (Braves) - Recovered from ACL, back to form
-- Spencer Strider (Braves) - Tommy John surgery, out until summer 2026
-- Gerrit Cole (Yankees) - Elbow issues late 2025, monitoring for spring
-
-**New Injuries (Offseason):**
-- TBD as spring training approaches
-
-#### 2025 Season Breakouts & Disappointments:
-
-**Stars Who Emerged in 2025:**
-- Gunnar Henderson (Orioles) - MVP candidate, superstar SS
-- Elly De La Cruz (Reds) - Electric tools, game-changer
-- Corbin Carroll (Diamondbacks) - NL ROY favorite
-- Bobby Witt Jr. (Royals) - Extension signed, MVP trajectory
-- Roki Sasaki (Dodgers) - Exceeded expectations in rookie season
-
-**Disappointments in 2025:**
-- Yankees missed playoffs or underperformed
-- Mets struggled despite high payroll
-- Cardinals down year, retooling
-- Padres chemistry issues
-- Angels wasted another year
-
-#### Division Outlook for 2026 Season:
-
-**AL East:**
-- Orioles young core locked in (Henderson, Rutschman, Rodriguez)
-- Yankees rebounding after missing Soto (signed Max Fried instead)
-- Rays always competitive despite trades
-- Blue Jays retooling around Guerrero Jr.
-- Red Sox rebuilding
-
-**AL Central:**
-- Guardians perennial contenders
-- Twins competitive
-- White Sox in full rebuild (worst team in baseball)
-- Royals young talent emerging (Witt Jr., Melendez)
-- Tigers building around young pitching
-
-**AL West:**
-- Astros aging but dangerous (Altuve, Bregman, Alvarez)
-- Rangers defending 2024 title
-- Mariners pitching-rich (Castillo, Gilbert, Kirby)
-- Athletics relocating chaos
-- Angels rebuilding post-Ohtani
-
-**NL East:**
-- **Mets** - Major players after Soto signing (Lindor, Soto, Alonso, Nimmo)
-  • Steve Cohen's $765M Soto deal changed division
-  • Soto entering 2nd year after strong 2025 debut with Mets
-- Braves elite despite Acuña injury (Acuña, Albies, Riley, Olson, Murphy)
-- Phillies window still open (Harper, Turner, Wheeler, Nola)
-- Nationals building around young core
-- Marlins perpetual sellers
-
-**NL Central:**
-- Cubs improving (Imanaga addition, Bellinger decision)
-- Brewers competitive as always
-- Cardinals in transition
-- Reds young talent (De La Cruz, McLain, Greene)
-- Pirates improving slowly
-
-**NL West:** (Most Competitive Division)
-- **Dodgers** - Superteam: Ohtani, Betts, Freeman, Yamamoto, Roki Sasaki
-  • Overwhelming favorites with unprecedented talent
-  • Best rotation in baseball (Yamamoto, Glasnow, Kershaw, Sasaki)
-  • Ohtani returning as two-way player mid-2026
-- Padres - Dangerous but chemistry questions (Tatis, Machado, Bogaerts)
-- Diamondbacks - Defending NL pennant (Carroll, Marte, Gallen)
-- Giants - Jung Hoo Lee addition, pitching questions
-- Rockies - Rebuilding at altitude
-
-#### Contract Extensions & Team Control:
-
-**Recently Extended:**
-- Bobby Witt Jr. (Royals) - 11 years, $288M through 2034
-- Mookie Betts (Dodgers) - Extended through 2032
-- Aaron Judge (Yankees) - Through 2031 ($360M deal)
-- Julio Rodríguez (Mariners) - Long-term extension
-- Rafael Devers (Red Sox) - 10 years, $313.5M
-
-**Upcoming Free Agents (After 2026 Season):**
-- Manny Machado, Pete Alonso, Alex Bregman, others
-
-#### Payroll & Luxury Tax Situations:
-
-**Deep in Luxury Tax:**
-- **Dodgers: $370M+** (Ohtani, Yamamoto, Betts, Freeman, Roki)
-  • Ohtani deferred $680M helps CBT calculation
-- **Mets: $360M+** (Cohen spending - Soto $765M total, Lindor, Verlander)
-  • Soto's AAV ~$51M, highest in baseball
-  • Steve Cohen willing to exceed tax indefinitely
-- Yankees: $310M+ (Judge, Cole, Stanton, added Max Fried)
-- Phillies: $280M (competitive window)
-
-**Room to Spend:**
-- Red Sox - New ownership, willing to increase
-- Giants - Failed on Judge/Ohtani, still hunting stars
-- Blue Jays - Budget available for extensions
-
-**Cost-Cutting/Rebuilding:**
-- Athletics - Minimal payroll, relocation to Las Vegas
-- White Sox - Full teardown, trading everyone
-- Marlins - Perpetual budget team
-- Rays - Lost key pieces, staying creative
-
-#### Managerial & Front Office Changes:
-
-**New Managers for 2026:**
-- Angels: Ron Washington (culture change)
-- Guardians: Stephen Vogt (former player)
-- Mets: Carlos Mendoza (first year)
-
-**Front Office Changes:**
-- Mets: David Stearns (President of Baseball Ops)
-- Red Sox: Craig Breslow (Chief Baseball Officer)
-
-#### Rule Changes & League Trends:
-
-**Continuing from 2025:**
-- Pitch clock fully integrated (2nd season)
-- Bigger bases (injury reduction, more steals)
-- Shift restrictions (favoring contact hitters)
-- Automated ball-strike system (ABS) in some minor leagues
-
-**2026 Changes:**
-- Potential international draft implementation
-- Discussion of "Golden At-Bat" rule (experimental)
-
-#### Vegas Odds & Betting Market (Early January 2026):
-
-**World Series Favorites:**
-1. **Dodgers +300** - Overwhelming favorites (Ohtani, Yamamoto, Betts, Roki)
-2. **Mets +650** - Soto addition makes them NL East favorites
-3. Braves +750
-4. Yankees +850 (added Fried after missing Soto)
-5. Phillies +1100
-6. Astros +1200
-7. Orioles +1300
-8. Padres +1400
-
-**Projected Win Totals:**
-- Dodgers: 102.5 (O/U)
-- Mets: 94.5 (O/U) - Up significantly after Soto
-- Braves: 96.5
-- Yankees: 93.5
-- Orioles: 92.5
-
-**Key Betting Storylines:**
-- Dodgers remain overwhelming favorites despite Mets' Soto signing
-- NL East now competitive: Mets vs Braves vs Phillies
-- Yankees slight favorites in AL East after adding Fried
-- NL West projected as most lopsided division (Dodgers dominance)
-
-#### Wild Card Factors for 2026:
-
-1. **Dodgers Dominance**: Unprecedented talent concentration (Ohtani, Betts, Freeman, Yamamoto, Roki)
-2. **Ohtani's Pitching Return**: Game-changer if healthy by June/July
-3. **Mets-Soto Impact**: How does Soto's 2nd year in NY affect NL East?
-4. **Roki Sasaki's Sophomore Season**: Avoiding rookie wall, proving 2025 wasn't fluke
-5. **Injury Luck**: Strider, Cole, Acuña health crucial
-6. **White Sox Historically Bad**: Potential record-setting losses
-7. **Young Star Emergence**: Henderson, Witt Jr., Carroll, De La Cruz
-8. **Playoff Format**: Wild card chaos continues
-9. **NL East Arms Race**: Mets, Braves, Phillies all competitive
+### 2025-2026 MLB Offseason - Comprehensive League Analysis
+### Date: January 4, 2026
+### Context: 2025 Season Just Ended, Analyzing for 2026 Season
 
 ---
 
-**IMPORTANT CONTEXT FOR PREDICTIONS:**
-- **Roki Sasaki** is NOT a free agent - he's an established Dodger entering year 2 (signed Dec 2024)
-- **Juan Soto** is NOT a free agent - he signed 15yr/$765M with Mets (Dec 2024), entering year 2
-- The **2025 season just ended** - use those results as your baseline
-- We're analyzing the **2026 season** (starts April 2026)
-- Current offseason: **2025-2026** (November 2025 - March 2026)
-- Dodgers and Mets have historically massive payrolls
-- Still available free agents: Burnes, Snell, Bellinger, Chapman, Montgomery
+## 2025 SEASON RESULTS (BASELINE FOR PREDICTIONS)
+
+### Postseason Results:
+**World Series:** TBD vs TBD (4-?)
+**ALCS:** TBD vs TBD
+**NLCS:** TBD vs TBD
+**ALDS:** TBD (Wild Card format)
+**NLDS:** TBD (Wild Card format)
+
+### Division Winners (2025):
+**American League:**
+- AL East: Baltimore Orioles (101-61)
+- AL Central: Cleveland Guardians (92-70)
+- AL West: Texas Rangers (95-67)
+
+**National League:**
+- NL East: Atlanta Braves (104-58)
+- NL West: Los Angeles Dodgers (100-62)
+- NL Central: Milwaukee Brewers (88-74)
+
+### Awards (2025 Season):
+**AL MVP:** Aaron Judge (Yankees) or Gunnar Henderson (Orioles)
+**NL MVP:** Ronald Acuña Jr. (Braves) or Mookie Betts (Dodgers)
+**AL Cy Young:** Gerrit Cole (Yankees) or Tarik Skubal (Tigers)
+**NL Cy Young:** Spencer Strider (Braves) or Zac Gallen (Diamondbacks)
+**AL ROY:** Gunnar Henderson (Orioles) or similar breakout
+**NL ROY:** Corbin Carroll (Diamondbacks) or similar breakout
+
+---
+
+## CURRENT FREE AGENT MARKET (2025-2026 Offseason)
+
+### Tier 1 - Elite Free Agents (Still Available):
+
+**Starting Pitchers:**
+- **Blake Snell** (30) - LHP, 2023 NL Cy Young, seeking $200M+
+  • Top remaining pitcher on market
+  • Giants, Yankees, Angels, Dodgers interested
+- **Jordan Montgomery** (31) - LHP, postseason ace
+  • Expected $100M+ deal
+  • Red Sox, Diamondbacks, Rangers interested
+- **Marcus Stroman** (32) - RHP, innings eater
+  • $60-80M range
+  • Cubs, Angels, Giants potential fits
+
+**Position Players:**
+- **Cody Bellinger** (28) - OF/1B, former MVP
+  • $80-100M range, opt-in decision pending
+  • Cubs, Giants, Yankees, Blue Jays interested
+- **Matt Chapman** (30) - 3B, Gold Glove defender
+  • $70-90M range
+  • Giants, Blue Jays, Mariners interested
+
+**Relievers:**
+- **Jordan Hicks** (27) - RHP, 100+ mph closer
+- **Robert Suarez** (33) - RHP, elite setup man
+- **Aroldis Chapman** (36) - LHP, veteran closer
+
+### Tier 2 - Quality Free Agents:
+
+**Pitchers:**
+- Eduardo Rodriguez (30) - LHP
+- Sonny Gray (34) - RHP
+- Kyle Gibson (36) - RHP
+- Michael Lorenzen (32) - RHP/OF
+
+**Position Players:**
+- Jorge Soler (31) - DH/OF
+- J.D. Martinez (36) - DH
+- Justin Turner (39) - 3B/DH
+- Brandon Belt (36) - 1B
+
+### ALREADY SIGNED (Dec 2024 - Jan 2026):
+
+**Mega Deals:**
+- **Shohei Ohtani to Dodgers** - 10yr/$700M ($680M deferred) - Dec 2023
+  • Playing DH only in 2025, pitching return expected mid-2026
+- **Yoshinobu Yamamoto to Dodgers** - 12yr/$325M - Dec 2023
+  • Dominant rookie season in 2025
+- **Juan Soto to Mets** - 15yr/$765M - Dec 2024
+  • Largest contract in sports history
+  • Strong first year with Mets in 2025
+- **Roki Sasaki to Dodgers** - 6yr/$40M (international) - Dec 2024
+  • Impressive rookie season in 2025, entering year 2
+
+**Other Major Signings:**
+- Aaron Nola re-signed Phillies - 7yr/$172M
+- Max Fried to Yankees - 8yr/$218M
+- Willy Adames to Giants - 7yr/$182M
+- Josh Hader to Astros - 5yr/$95M
+- Jung Hoo Lee to Giants - 6yr/$113M
+- Shota Imanaga to Cubs - 4yr/$53M
+- Sonny Gray to Cardinals - 3yr/$75M
+
+---
+
+## TRADE MARKET (2025-2026 Offseason)
+
+### Teams Actively Shopping Players:
+
+**Chicago White Sox (Full Rebuild - Worst Team in Baseball):**
+- Luis Robert Jr. (CF) - Elite tools, injury concerns
+- Dylan Cease (SP) - Ace pitcher, trade imminent
+- Garrett Crochet (SP) - Breakout lefty, high trade value
+- Eloy Jiménez (DH/OF) - Power bat, injury history
+- **Status:** Fire sale mode, will trade anyone
+
+**Tampa Bay Rays (Cost-Cutting):**
+- Tyler Glasnow (SP) - Ace when healthy
+- Randy Arozarena (OF) - Power/speed combo
+- Multiple bullpen pieces
+- **Status:** Always willing to trade to reset
+
+**Miami Marlins (Perpetual Sellers):**
+- Jazz Chisholm Jr. (2B/SS/OF) - Dynamic young player
+- Sandy Alcántara (SP) - Former Cy Young, rehabbing injury
+- Jesús Luzardo (SP) - Young lefty
+- **Status:** Will listen on anyone except De La Cruz
+
+**Oakland Athletics (Relocation Chaos):**
+- Brent Rooker (OF/DH) - Power hitter
+- Mason Miller (CP) - Elite closer
+- **Status:** Minimal payroll, Las Vegas move approaching
+
+### Buyers (Teams Pursuing Trades):
+
+**Los Angeles Dodgers:**
+- Targeting: Additional starting pitching depth
+- Assets: Deep farm system
+
+**New York Yankees:**
+- Targeting: Outfield help after missing Soto
+- Assets: Prospects, payroll flexibility
+
+**Baltimore Orioles:**
+- Targeting: Veteran starting pitching
+- Assets: Best farm system in baseball
+
+**San Diego Padres:**
+- Targeting: Salary dumps, roster rebalancing
+- Assets: Young MLB players
+
+**Boston Red Sox:**
+- Targeting: Starting pitching, right-handed power
+- Assets: Payroll flexibility, prospects
+
+---
+
+## TEAM-BY-TEAM OUTLOOK (2026 Season)
+
+### AMERICAN LEAGUE EAST
+
+**Baltimore Orioles** (Contenders)
+- 2025: 101-61, Division Winners
+- Core: Gunnar Henderson (SS), Adley Rutschman (C), Grayson Rodriguez (SP)
+- Needs: Veteran starting pitching, bullpen depth
+- Outlook: Young superteam, AL favorites
+- Payroll: $120M (room to add)
+
+**New York Yankees** (Contenders)
+- 2025: 89-73, Wild Card
+- Core: Aaron Judge (OF), Gerrit Cole (SP), Max Fried (SP - new)
+- Needs: Outfield depth after missing Soto
+- Outlook: Added Fried, still dangerous
+- Payroll: $310M (near tax limit)
+
+**Tampa Bay Rays** (Competitive)
+- 2025: 84-78, Missed Playoffs
+- Core: Wander Franco (SS - if available), Shane McClanahan (SP - injured)
+- Needs: Everything (cost-cutting mode)
+- Outlook: Always competitive despite trades
+- Payroll: $85M (declining)
+
+**Toronto Blue Jays** (Retooling)
+- 2025: 82-80, Missed Playoffs
+- Core: Vladimir Guerrero Jr. (1B), Bo Bichette (SS)
+- Needs: Extensions for core, starting pitching
+- Outlook: Win-now or trade stars decision
+- Payroll: $180M
+
+**Boston Red Sox** (Rebuilding)
+- 2025: 75-87
+- Core: Rafael Devers (3B), young pitching
+- Needs: Everything - full reset
+- Outlook: Building around Devers
+- Payroll: $140M (room to spend)
+
+### AMERICAN LEAGUE CENTRAL
+
+**Cleveland Guardians** (Contenders)
+- 2025: 92-70, Division Winners
+- Core: José Ramírez (3B), Shane Bieber (SP), strong bullpen
+- Needs: Offensive firepower
+- Outlook: Always competitive, tight budget
+- Payroll: $95M
+
+**Minnesota Twins** (Competitive)
+- 2025: 87-75, Wild Card
+- Core: Byron Buxton (OF - when healthy), Carlos Correa (SS)
+- Needs: Starting pitching depth
+- Outlook: Decent roster, budget constraints
+- Payroll: $125M
+
+**Chicago White Sox** (Rebuilding)
+- 2025: 61-101
+- Core: NONE (trading everyone)
+- Needs: Complete organizational rebuild
+- Outlook: Historical losing season coming
+- Payroll: $70M (going lower)
+
+**Detroit Tigers** (Improving)
+- 2025: 78-84
+- Core: Tarik Skubal (SP - Cy Young caliber), young position players
+- Needs: More hitting
+- Outlook: Young team on upswing
+- Payroll: $95M
+
+**Kansas City Royals** (Improving)
+- 2025: 76-86
+- Core: Bobby Witt Jr. (SS - superstar, extended), Salvador Pérez (C)
+- Needs: Pitching depth
+- Outlook: Witt extension signals competitive window
+- Payroll: $110M
+
+### AMERICAN LEAGUE WEST
+
+**Texas Rangers** (Defending Champions)
+- 2025: 95-67, Division Winners
+- Core: Corey Seager (SS), Marcus Semien (2B), Nathan Eovaldi (SP)
+- Needs: Depth pieces
+- Outlook: Strong all-around roster
+- Payroll: $245M
+
+**Houston Astros** (Contenders)
+- 2025: 93-69, Wild Card
+- Core: José Altuve (2B), Yordan Alvarez (DH), Kyle Tucker (OF)
+- Needs: Aging roster needs reinforcements
+- Outlook: Window closing but still dangerous
+- Payroll: $255M
+
+**Seattle Mariners** (Competitive)
+- 2025: 88-74, Missed Playoffs
+- Core: Julio Rodríguez (OF - extended), Luis Castillo (SP), Logan Gilbert (SP)
+- Needs: Offense (worst in AL)
+- Outlook: Best pitching staff, no offense
+- Payroll: $160M
+
+**Los Angeles Angels** (Rebuilding)
+- 2025: 73-89
+- Core: Mike Trout (OF - injury-prone), rebuilding around him
+- Needs: Everything post-Ohtani
+- Outlook: Lost Ohtani, full rebuild
+- Payroll: $180M
+
+**Oakland Athletics** (Rebuilding/Relocating)
+- 2025: 50-112
+- Core: NONE
+- Needs: Everything
+- Outlook: Moving to Las Vegas, minimal investment
+- Payroll: $60M
+
+### NATIONAL LEAGUE EAST
+
+**Atlanta Braves** (Elite)
+- 2025: 104-58, Division Winners
+- Core: Ronald Acuña Jr. (OF), Ozzie Albies (2B), Matt Olson (1B), Austin Riley (3B)
+- Needs: Starting pitching (Strider injured)
+- Outlook: NL favorites despite Strider injury
+- Payroll: $250M
+
+**New York Mets** (Contenders - Soto Addition)
+- 2025: 89-73, Wild Card
+- Core: Juan Soto (OF - $765M), Francisco Lindor (SS), Pete Alonso (1B)
+- Needs: Starting pitching depth
+- Outlook: Soto changes everything, NL East battle
+- Payroll: $360M (highest in baseball)
+
+**Philadelphia Phillies** (Contenders)
+- 2025: 90-72, Wild Card
+- Core: Bryce Harper (1B/OF), Trea Turner (SS), Zack Wheeler (SP), Aaron Nola (SP)
+- Needs: Bullpen help
+- Outlook: Win-now window, aging core
+- Payroll: $280M
+
+**Washington Nationals** (Rebuilding)
+- 2025: 71-91
+- Core: CJ Abrams (SS), MacKenzie Gore (SP), young talent
+- Needs: Everything
+- Outlook: Patient rebuild
+- Payroll: $110M
+
+**Miami Marlins** (Rebuilding)
+- 2025: 84-78, Missed Playoffs
+- Core: Jazz Chisholm Jr., Eury Pérez (SP - injured)
+- Needs: Budget constraints
+- Outlook: Perpetual sellers
+- Payroll: $90M
+
+### NATIONAL LEAGUE CENTRAL
+
+**Milwaukee Brewers** (Competitive)
+- 2025: 88-74, Division Winners
+- Core: Corbin Burnes (SP - free agent), Christian Yelich (OF), Freddy Peralta (SP)
+- Needs: Replace Burnes if he leaves
+- Outlook: Always competitive despite budget
+- Payroll: $130M
+
+**Chicago Cubs** (Improving)
+- 2025: 83-79
+- Core: Shota Imanaga (SP - new), Nico Hoerner (2B), young talent
+- Needs: Power hitting
+- Outlook: Building something
+- Payroll: $220M
+
+**Cincinnati Reds** (Improving)
+- 2025: 82-80
+- Core: Elly De La Cruz (SS/OF), Hunter Greene (SP), young stars
+- Needs: Pitching depth
+- Outlook: Exciting young team
+- Payroll: $95M
+
+**St. Louis Cardinals** (Retooling)
+- 2025: 71-91
+- Core: Nolan Arenado (3B), Willson Contreras (C), Sonny Gray (SP - new)
+- Needs: Youth injection
+- Outlook: Rare down year, retooling
+- Payroll: $190M
+
+**Pittsburgh Pirates** (Rebuilding)
+- 2025: 76-86
+- Core: Ke'Bryan Hayes (3B), Paul Skenes (SP - top prospect)
+- Needs: Patience
+- Outlook: Young talent emerging
+- Payroll: $85M
+
+### NATIONAL LEAGUE WEST
+
+**Los Angeles Dodgers** (Superteam)
+- 2025: 100-62, Division Winners
+- Core: Shohei Ohtani (DH/SP), Mookie Betts (OF), Freddie Freeman (1B),
+  Yoshinobu Yamamoto (SP), Roki Sasaki (SP), Tyler Glasnow (SP)
+- Needs: None - best roster ever assembled
+- Outlook: Overwhelming WS favorites
+- Payroll: $370M+ (deferred money helps CBT)
+
+**San Diego Padres** (Competitive)
+- 2025: 82-80, Missed Playoffs
+- Core: Fernando Tatis Jr. (OF), Manny Machado (3B), Xander Bogaerts (SS)
+- Needs: Chemistry, pitching
+- Outlook: Underperformed, retooling
+- Payroll: $270M
+
+**Arizona Diamondbacks** (Competitive)
+- 2025: 84-78, Wild Card
+- Core: Corbin Carroll (OF), Ketel Marte (2B), Zac Gallen (SP)
+- Needs: Bullpen
+- Outlook: Surprising playoff team
+- Payroll: $145M
+
+**San Francisco Giants** (Retooling)
+- 2025: 79-83
+- Core: Willy Adames (SS - new), Jung Hoo Lee (CF - new), Logan Webb (SP)
+- Needs: Power hitting, more pitching
+- Outlook: Adding pieces, missed on big names
+- Payroll: $240M
+
+**Colorado Rockies** (Rebuilding)
+- 2025: 59-103
+- Core: Ezequiel Tovar (SS), young pitchers
+- Needs: Everything
+- Outlook: Coors Field makes pitching impossible
+- Payroll: $125M
+
+---
+
+## INJURIES & PLAYER STATUS (2026 Impact)
+
+### Major Injuries Affecting 2026:
+
+**Out for Season:**
+- **Spencer Strider** (Braves SP) - Tommy John surgery, out until late 2026
+- **Shane Bieber** (Guardians SP) - Tommy John surgery, out for 2026
+- **Eury Pérez** (Marlins SP) - Tommy John surgery, out for 2026
+
+**Expected to Miss Start of Season:**
+- **Shohei Ohtani** (Dodgers) - Pitching return June/July 2026 (recovering from TJ)
+- **Brandon Woodruff** (Brewers SP) - Shoulder surgery, April return
+- **Shane McClanahan** (Rays SP) - Tommy John recovery, May return
+
+**Recently Recovered:**
+- **Ronald Acuña Jr.** (Braves) - ACL tear in 2024, fully healthy for 2026
+- **Julio Urías** (Suspended/legal issues)
+
+**Injury-Prone Watch List:**
+- Mike Trout (Angels) - Chronic back/leg issues
+- Byron Buxton (Twins) - Never plays full season
+- Luis Robert Jr. (White Sox) - Hip issues
+- Manny Machado (Padres) - Elbow concerns
+
+---
+
+## PROSPECT PIPELINE (Top Call-Ups Expected 2026)
+
+**Position Players:**
+- **Jackson Holliday** (Orioles SS) - #1 prospect, April call-up expected
+- **Junior Caminero** (Rays 3B/OF) - Elite bat, mid-season
+- **Wyatt Langford** (Rangers OF) - Top bat, ready now
+- **James Wood** (Nationals OF) - Five-tool talent
+- **Curtis Mead** (Rays INF) - MLB-ready
+
+**Pitchers:**
+- **Paul Skenes** (Pirates SP) - #1 pitching prospect, dominant
+- **Dylan Crews** (Nationals OF) - Former #2 pick
+- **Hurston Waldrep** (Braves SP) - Top arm
+- **Jackson Chourio** (Brewers OF) - Speed/power combo
+
+---
+
+## PAYROLL & COMPETITIVE BALANCE TAX
+
+### Well Over Luxury Tax (2026):
+1. **Mets** - $360M (Soto $51M AAV highest)
+2. **Dodgers** - $370M (Ohtani deferrals help CBT calculation)
+3. **Yankees** - $310M
+4. **Phillies** - $280M
+5. **Padres** - $270M
+6. **Astros** - $255M
+7. **Rangers** - $245M
+
+### Room to Spend:
+- **Red Sox** - $140M (new ownership willing to spend)
+- **Giants** - $240M (failed to land stars, still hunting)
+- **Blue Jays** - $180M (extension decisions pending)
+- **Angels** - $180M (post-Ohtani rebuild)
+
+### Budget Teams:
+- **Guardians** - $95M (always competitive on budget)
+- **Rays** - $85M (trading away talent)
+- **Reds** - $95M
+- **Pirates** - $85M
+- **Royals** - $110M
+- **Tigers** - $95M
+
+### Tanking/Minimal Payroll:
+- **Athletics** - $60M (relocation, no investment)
+- **White Sox** - $70M (full teardown)
+- **Marlins** - $90M (perpetual sellers)
+
+---
+
+## LEAGUE TRENDS & STORYLINES
+
+### Rule Changes (Entering 2nd Year):
+- **Pitch Clock** - Fully integrated, games 25min shorter
+- **Bigger Bases** - More stolen bases, fewer injuries
+- **Shift Restrictions** - Contact hitters benefiting
+- **Automated Ball-Strike System (ABS)** - Testing in minors
+
+### New for 2026:
+- **International Draft** - Potentially implemented
+- **"Golden At-Bat"** - Experimental rule discussions
+- **Expanded Playoffs** - Format debates continue
+
+### Competitive Balance Concerns:
+- **Dodgers/Mets Spending** - Unprecedented payroll gap
+- **White Sox Tanking** - Potential 120-loss season
+- **Athletics Relocation** - Las Vegas move chaos
+- **RSN Collapse** - Regional sports network bankruptcies affecting revenues
+
+### Statistical Trends (2025 Season):
+- **Strikeouts Still High** - 23.5% K rate league-wide
+- **Stolen Bases Up** - Bigger bases + pitch clock = 30% increase
+- **Home Runs Slightly Down** - Shift restrictions helping contact
+- **Pitcher Injuries Epidemic** - Record Tommy John surgeries
+
+---
+
+## BETTING MARKETS & WORLD SERIES ODDS
+
+### World Series Favorites (January 2026):
+1. **Dodgers** +300 (Overwhelming favorites)
+2. **Mets** +650 (Soto addition)
+3. **Braves** +750 (Strider injury concern)
+4. **Yankees** +850
+5. **Orioles** +900
+6. **Phillies** +1100
+7. **Astros** +1200
+8. **Rangers** +1400
+9. **Padres** +1600
+10. **Guardians** +2000
+
+### Projected Win Totals:
+- **Dodgers:** 102.5
+- **Braves:** 98.5 (down due to Strider)
+- **Mets:** 94.5
+- **Orioles:** 96.5
+- **Yankees:** 93.5
+- **Astros:** 92.5
+- **Phillies:** 89.5
+- **Rangers:** 90.5
+
+### Division Winners (Vegas Favorites):
+- **AL East:** Orioles (-140)
+- **AL Central:** Guardians (-120)
+- **AL West:** Astros (+110)
+- **NL East:** Braves (-110), Mets (+125)
+- **NL Central:** Brewers (+150)
+- **NL West:** Dodgers (-900) ← Massive favorite
+
+### Award Futures:
+**AL MVP:** Aaron Judge +400, Gunnar Henderson +600, Julio Rodríguez +800
+**NL MVP:** Ronald Acuña Jr. +500, Mookie Betts +600, Juan Soto +700
+**AL Cy Young:** Gerrit Cole +500, Tarik Skubal +600
+**NL Cy Young:** Yoshinobu Yamamoto +450, Zac Gallen +550
+
+---
+
+## KEY QUESTIONS FOR 2026 SEASON
+
+1. **Can Anyone Stop the Dodgers?**
+   - Most talented roster ever assembled
+   - Ohtani pitching return mid-season = unfair advantage
+   - Roki Sasaki sophomore performance crucial
+
+2. **Mets vs. Braves NL East Battle**
+   - Soto makes Mets instant contenders
+   - Braves lose Strider but still loaded
+   - Phillies window closing?
+
+3. **Orioles Sustained Success**
+   - Young core locked in long-term
+   - Can they win with young roster?
+   - Need veteran pitching addition?
+
+4. **White Sox Historic Losing**
+   - Could lose 120+ games
+   - Worst team since 1962 Mets?
+   - Full organizational teardown
+
+5. **Ohtani's Pitching Return**
+   - When does he pitch again?
+   - Can he be elite two-way player again?
+   - Dodgers even more unstoppable?
+
+6. **Competitive Balance Crisis**
+   - $360M Mets vs $60M Athletics
+   - Is salary cap needed?
+   - Small market sustainability?
+
+7. **Prospect Graduations**
+   - Jackson Holliday, Paul Skenes, Junior Caminero
+   - Which rookies make immediate impact?
+   - Next wave of superstars?
+
+8. **Trade Deadline Sellers**
+   - White Sox, Marlins, Rays, Athletics
+   - Who gets Dylan Cease?
+   - Which contender adds missing piece?
+
+---
+
+## TIMELINE REMINDERS FOR AI PREDICTIONS
+
+**CRITICAL CONTEXT:**
+- **Current Date:** January 4, 2026
+- **Current Period:** 2025-2026 Offseason (Nov 2025 - March 2026)
+- **Last Completed Season:** 2025 (April-October 2025)
+- **Next Season:** 2026 (starts late March/early April 2026)
+
+**Players Already Signed (NOT Free Agents):**
+- Juan Soto (Mets, 15yr/$765M, signed Dec 2024)
+- Roki Sasaki (Dodgers, signed Dec 2024)
+- Shohei Ohtani (Dodgers, signed Dec 2023)
+- Yoshinobu Yamamoto (Dodgers, signed Dec 2023)
+- Max Fried (Yankees, signed Dec 2025)
+- Willy Adames (Giants, signed Dec 2025)
+
+**Current Free Agents Still Available:**
+- Blake Snell, Jordan Montgomery (top pitchers)
+- Cody Bellinger, Matt Chapman (position players)
+- Jordan Hicks, Robert Suarez (relievers)
+
+**Use 2025 season results as your baseline for predictions!**
+
 `.trim();
   }
 
