@@ -11,6 +11,7 @@ import { parseClaudeResponse, TEAM_CODES } from '@/lib/parsers';
 import { fetchMLBData } from '@/lib/mlb-data-fetcher';
 import { detectPatterns, saveDetectedPatterns, formatPatternsForPrompt } from '@/lib/pattern-analyzer';
 import { calculateAccuracyMetrics, formatAccuracyForPrompt } from '@/lib/accuracy-calculator';
+import { getActiveConfig, calculateAdaptiveConfig, updateActiveConfig, formatAdaptiveConfigForPrompt } from '@/lib/adaptive-config-calculator';
 
 export interface ResearchCycleConfig {
   model?: string;
@@ -109,16 +110,34 @@ export async function runResearchCycle(
 
     // Phase 3: Calculate accuracy metrics
     let accuracyContext = '';
+    let accuracyMetrics = null;
     if (pastExps && pastExps.length >= 3) {
       console.log('[ResearchCycle] Calculating accuracy metrics...');
-      const accuracyMetrics = await calculateAccuracyMetrics(50);
+      accuracyMetrics = await calculateAccuracyMetrics(50);
       if (accuracyMetrics.total_hypotheses_evaluated > 0 || accuracyMetrics.total_teams_evaluated > 0) {
         accuracyContext = formatAccuracyForPrompt(accuracyMetrics);
         console.log(`[ResearchCycle] Accuracy: ${accuracyMetrics.overall_hypothesis_accuracy?.toFixed(1)}% (${accuracyMetrics.total_hypotheses_evaluated} hypotheses evaluated)`);
       }
     }
 
-    const userPrompt = `${historyContext}${patternsContext}${accuracyContext}\n\n### Current MLB Data:\n${currentMLBData}\n\nNow run the next research cycle.`;
+    // Phase 4: Adaptive configuration (auto-tune parameters based on performance)
+    let adaptiveConfigContext = '';
+    if (accuracyMetrics && (accuracyMetrics.total_hypotheses_evaluated >= 5 || accuracyMetrics.total_teams_evaluated >= 5)) {
+      console.log('[ResearchCycle] Calculating adaptive configuration...');
+      const newConfig = calculateAdaptiveConfig(accuracyMetrics);
+      await updateActiveConfig(newConfig);
+      adaptiveConfigContext = formatAdaptiveConfigForPrompt(newConfig);
+      console.log(`[ResearchCycle] Adaptive Config: Boldness=${newConfig.boldness_level}, Surprise=[${newConfig.surprise_threshold_low},${newConfig.surprise_threshold_high}]`);
+    } else {
+      // Use existing config if available
+      const existingConfig = await getActiveConfig();
+      if (existingConfig) {
+        adaptiveConfigContext = formatAdaptiveConfigForPrompt(existingConfig);
+        console.log('[ResearchCycle] Using existing adaptive config');
+      }
+    }
+
+    const userPrompt = `${historyContext}${patternsContext}${accuracyContext}${adaptiveConfigContext}\n\n### Current MLB Data:\n${currentMLBData}\n\nNow run the next research cycle.`;
 
     // Call Claude API with retry logic
     const response = await callClaudeWithRetry(

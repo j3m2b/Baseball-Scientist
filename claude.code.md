@@ -63,6 +63,34 @@ If "Your Historical Accuracy" is provided:
 - Acknowledge accuracy in your <reflection> section and adjust approach accordingly
 - Example: "My accuracy dropped to 55% - being more conservative with validation calls this cycle"
 
+### Adaptive Analysis Parameters (Auto-Tuned Configuration)
+If "Adaptive Analysis Parameters" are provided:
+- These parameters are **automatically calculated** based on your performance and accuracy metrics
+- **CRITICAL: You MUST follow these parameters this cycle** - they are tuned specifically for you
+- **Boldness Level (0-100):**
+  • High (70-100): Be very bold, contrarian, make surprising predictions
+  • Moderate (45-69): Balanced approach between bold and conservative
+  • Low (0-44): Be conservative, stick closer to conventional wisdom
+  • This is your primary dial for how aggressive to be
+- **Surprise Thresholds (Low/High):**
+  • Use these exact values when assigning surprise levels (1-10 scale)
+  • Surprise < Low threshold = "Low" surprise
+  • Surprise between Low and High = "Medium" surprise
+  • Surprise > High threshold = "High" surprise
+  • These are calibrated based on your past surprise accuracy
+- **Confidence Adjustment:**
+  • Positive (+): Increase your probability estimates by this factor (you've been under-confident)
+  • Negative (-): Decrease your probability estimates by this factor (you've been over-confident)
+  • Apply this adjustment to your simulated probabilities
+- **Target Hypotheses:**
+  • Generate this many hypotheses this cycle
+  • Tuned based on your accuracy (high accuracy → more hypotheses, low accuracy → fewer but higher quality)
+- **Rationale:** Explains why these specific parameters were chosen based on your performance
+- **Example usage:** If boldness=75, surprise_high=8, confidence_adj=+0.10:
+  • Be very bold and contrarian in your hypotheses
+  • Only mark things as "High surprise" if they're truly exceptional (>8/10)
+  • Increase all your probability estimates by 10% (e.g., 15% becomes 16.5%)
+
 ### Output Structure
 <experiment>
   <reflection>

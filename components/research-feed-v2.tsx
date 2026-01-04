@@ -6,11 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatTimeAgo } from '@/lib/utils';
-import { FlaskConical, TrendingUp, LineChart, Clock, Play, AlertCircle, CheckCircle, Sparkles, Zap, Target, Brain, Lightbulb, Activity, BarChart } from 'lucide-react';
+import { FlaskConical, TrendingUp, LineChart, Clock, Play, AlertCircle, CheckCircle, Sparkles, Zap, Target, Brain, Lightbulb, Activity, BarChart, Settings } from 'lucide-react';
 import { ProbabilityChart } from './probability-chart';
 import { LearningsDisplay } from './learnings-display';
 import { PatternsDisplay } from './patterns-display';
 import { AccuracyDisplay } from './accuracy-display';
+import { AdaptiveConfigDisplay } from './adaptive-config-display';
 
 interface Experiment {
   id: string;
@@ -84,6 +85,18 @@ interface AccuracyMetrics {
   historical_accuracy: number | null;
 }
 
+interface AdaptiveConfig {
+  boldness_level: number;
+  surprise_threshold_low: number;
+  surprise_threshold_high: number;
+  confidence_adjustment: number;
+  hypothesis_count_target: number;
+  rationale: string;
+  based_on_accuracy: number | null;
+  based_on_trend: string | null;
+  based_on_cycles: number | null;
+}
+
 interface LatestData {
   experiment: Experiment;
   hypotheses: Hypothesis[];
@@ -97,6 +110,7 @@ export function ResearchFeedV2() {
   const [latestData, setLatestData] = useState<LatestData | null>(null);
   const [patterns, setPatterns] = useState<DetectedPattern[]>([]);
   const [accuracyMetrics, setAccuracyMetrics] = useState<AccuracyMetrics | null>(null);
+  const [adaptiveConfig, setAdaptiveConfig] = useState<AdaptiveConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [triggering, setTriggering] = useState(false);
   const [triggerError, setTriggerError] = useState<string | null>(null);
@@ -109,6 +123,7 @@ export function ResearchFeedV2() {
     fetchLatestData();
     fetchPatterns();
     fetchAccuracy();
+    fetchAdaptiveConfig();
     subscribeToUpdates();
 
     // Load saved secret if available
@@ -160,6 +175,16 @@ export function ResearchFeedV2() {
       setAccuracyMetrics(data.metrics || null);
     } catch (error) {
       console.error('Failed to fetch accuracy:', error);
+    }
+  }
+
+  async function fetchAdaptiveConfig() {
+    try {
+      const response = await fetch('/api/adaptive-config');
+      const data = await response.json();
+      setAdaptiveConfig(data.config || null);
+    } catch (error) {
+      console.error('Failed to fetch adaptive config:', error);
     }
   }
 
@@ -427,7 +452,7 @@ export function ResearchFeedV2() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Tabs defaultValue="activity" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 lg:w-auto lg:inline-flex bg-slate-800/50 border border-blue-500/20 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7 lg:w-auto lg:inline-flex bg-slate-800/50 border border-blue-500/20 p-1 rounded-lg">
             <TabsTrigger value="activity" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <Clock className="h-4 w-4" />
               Latest Activity
@@ -443,6 +468,10 @@ export function ResearchFeedV2() {
             <TabsTrigger value="accuracy" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <BarChart className="h-4 w-4" />
               Accuracy
+            </TabsTrigger>
+            <TabsTrigger value="config" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+              <Settings className="h-4 w-4" />
+              Adaptive Config
             </TabsTrigger>
             <TabsTrigger value="findings" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <Target className="h-4 w-4" />
@@ -514,6 +543,10 @@ export function ResearchFeedV2() {
 
           <TabsContent value="accuracy" className="space-y-4">
             <AccuracyDisplay metrics={accuracyMetrics} />
+          </TabsContent>
+
+          <TabsContent value="config" className="space-y-4">
+            <AdaptiveConfigDisplay config={adaptiveConfig} />
           </TabsContent>
 
           <TabsContent value="findings" className="space-y-4">
