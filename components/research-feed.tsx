@@ -62,18 +62,37 @@ export function ResearchFeed() {
   const [triggerSuccess, setTriggerSuccess] = useState<string | null>(null);
   const [secretInput, setSecretInput] = useState('');
   const [showSecretInput, setShowSecretInput] = useState(false);
+  const [rememberSecret, setRememberSecret] = useState(false);
 
   useEffect(() => {
     fetchLatestData();
     subscribeToUpdates();
+
+    // Load saved secret if available
+    const savedSecret = localStorage.getItem('cron_secret');
+    if (savedSecret) {
+      setSecretInput(savedSecret);
+      setRememberSecret(true);
+    }
   }, []);
 
   async function fetchLatestData() {
     try {
       const response = await fetch('/api/data');
       const data = await response.json();
-      if (data.latest) {
-        setLatestData(data.latest);
+
+      // Handle the API response format
+      if (data.experiment) {
+        setLatestData({
+          experiment: data.experiment,
+          hypotheses: data.hypotheses || [],
+          insights: data.insights || [],
+          teamProbabilities: data.probabilities || [],
+          nextExperiments: []
+        });
+      } else if (data.error && data.error.includes('No experiments found')) {
+        // No data yet - show the "no research" state
+        setLatestData(null);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -113,6 +132,11 @@ export function ResearchFeed() {
     setTriggerError(null);
     setTriggerSuccess(null);
 
+    // Save secret to localStorage if "remember" is checked
+    if (rememberSecret) {
+      localStorage.setItem('cron_secret', secretInput.trim());
+    }
+
     try {
       const response = await fetch('/api/trigger', {
         method: 'POST',
@@ -126,8 +150,7 @@ export function ResearchFeed() {
         throw new Error(data.error || 'Failed to trigger research');
       }
 
-      setTriggerSuccess(`Research cycle #${data.experimentId.slice(0, 8)} started! Check back in a minute.`);
-      setSecretInput('');
+      setTriggerSuccess(`Research cycle #${data.experimentId.slice(0, 8)} started! ${data.hypothesesCount} hypotheses generated. Check back in a minute.`);
 
       // Refresh data after a short delay
       setTimeout(() => {
@@ -176,6 +199,15 @@ export function ResearchFeed() {
                 disabled={triggering}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={rememberSecret}
+                  onChange={(e) => setRememberSecret(e.target.checked)}
+                  className="rounded"
+                />
+                Remember secret (stored in browser)
+              </label>
             </div>
 
             {triggerError && (
@@ -231,7 +263,7 @@ export function ResearchFeed() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {showSecretInput && (
             <div className="flex items-center gap-2">
               <input
@@ -245,11 +277,20 @@ export function ResearchFeed() {
                 disabled={triggering}
                 className="w-40 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
+              <label className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+                <input
+                  type="checkbox"
+                  checked={rememberSecret}
+                  onChange={(e) => setRememberSecret(e.target.checked)}
+                  className="rounded"
+                />
+                Remember
+              </label>
             </div>
           )}
           <button
             onClick={() => {
-              if (!showSecretInput) {
+              if (!secretInput) {
                 setShowSecretInput(true);
               } else {
                 triggerResearch();
@@ -257,7 +298,7 @@ export function ResearchFeed() {
             }}
             disabled={triggering}
             className={`inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 ${
-              showSecretInput
+              secretInput
                 ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                 : 'border border-input bg-background hover:bg-accent hover:text-accent-foreground'
             }`}
@@ -270,10 +311,18 @@ export function ResearchFeed() {
             ) : (
               <>
                 <Play className="h-4 w-4 mr-2" />
-                Run New Cycle
+                {secretInput ? 'Run New Cycle' : 'Enter Secret'}
               </>
             )}
           </button>
+          {!secretInput && (
+            <button
+              onClick={() => setShowSecretInput(!showSecretInput)}
+              className="text-xs text-muted-foreground hover:text-foreground underline"
+            >
+              {showSecretInput ? 'Hide' : 'Show Secret Input'}
+            </button>
+          )}
         </div>
       </div>
 
