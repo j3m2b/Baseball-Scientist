@@ -13,6 +13,8 @@ import { detectPatterns, saveDetectedPatterns, formatPatternsForPrompt } from '@
 import { calculateAccuracyMetrics, formatAccuracyForPrompt } from '@/lib/accuracy-calculator';
 import { getActiveConfig, calculateAdaptiveConfig, updateActiveConfig, formatAdaptiveConfigForPrompt } from '@/lib/adaptive-config-calculator';
 import { compressHistory, validateContextBudget } from '@/lib/context-optimizer';
+import { autoValidateHypotheses } from '@/lib/hypothesis-validator';
+import { autoValidateTeamOutcomes } from '@/lib/team-outcomes-validator';
 
 export interface ResearchCycleConfig {
   model?: string;
@@ -62,8 +64,30 @@ export async function runResearchCycle(
     // Fetch current MLB data (now using real data!)
     const currentMLBData = await fetchMLBData();
 
-    // Phase 5: Compressed history with time-tiered detail (scales to 100+ cycles)
+    // Phase 6: Auto-validation (Claude validates its own predictions)
+    // This runs BEFORE accuracy calculations to ensure latest validation data is included
     const supabase = supabaseServer;
+    console.log('[ResearchCycle] Auto-validating past predictions...');
+
+    // Validate hypotheses (up to 5 per cycle)
+    const hypothesisValidations = await autoValidateHypotheses(5);
+    if (hypothesisValidations.length > 0) {
+      console.log(`[ResearchCycle] ✓ Auto-validated ${hypothesisValidations.length} hypotheses`);
+      for (const val of hypothesisValidations) {
+        console.log(`  - "${val.hypothesis.substring(0, 50)}..." → ${val.actualOutcome ? 'TRUE' : 'FALSE'}`);
+      }
+    }
+
+    // Validate team outcomes (up to 3 experiments per cycle)
+    const teamValidations = await autoValidateTeamOutcomes(3);
+    if (teamValidations.length > 0) {
+      console.log(`[ResearchCycle] ✓ Auto-validated ${teamValidations.length} team outcomes`);
+      for (const val of teamValidations) {
+        console.log(`  - ${val.teamName} → ${val.actualResult.toUpperCase()}`);
+      }
+    }
+
+    // Phase 5: Compressed history with time-tiered detail (scales to 100+ cycles)
     console.log('[ResearchCycle] Compressing history with time-tiered detail...');
     const { compressed: historyContext, tokenCount: historyTokens, cyclesIncluded, compressionRatio } = await compressHistory(100);
     console.log(`[ResearchCycle] History: ${cyclesIncluded} cycles compressed to ${historyTokens} tokens (${compressionRatio} compression)`);

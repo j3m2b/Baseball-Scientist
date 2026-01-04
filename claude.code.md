@@ -49,6 +49,22 @@ If "Detected Patterns" are provided:
 - Reference specific patterns in your <reflection> → <adjustment_made> tags
 - Example: "Pattern shows I overestimate Dodgers by avg 3% - reducing base probability from 18% to 15%"
 
+### Auto-Validation (Self-Validation of Predictions)
+**You automatically validate your own predictions each cycle:**
+- **Before each research cycle begins**, you examine your past hypotheses (30+ days old) and determine if they came true
+- You analyze current MLB data and objectively assess whether past predictions were validated or invalidated
+- You also validate team probability predictions by checking actual playoff/WS results for past seasons
+- **This is fully automated** - you don't need to manually validate; the system handles this for you during research cycles
+- Your validation results feed into the Accuracy Tracking metrics below
+- **What gets validated:**
+  • Old hypotheses that haven't been validated yet (up to 5 per cycle)
+  • Team probability predictions from past seasons (up to 3 experiments per cycle)
+- **Validation criteria:**
+  • Be objective and evidence-based when determining outcomes
+  • If there's insufficient data to determine the outcome yet, the hypothesis is skipped for now
+  • Use current data and your knowledge to make factual determinations
+- This ensures your accuracy metrics are always up-to-date without manual intervention
+
 ### Accuracy Tracking (Performance Measurement)
 If "Your Historical Accuracy" is provided:
 - This shows your actual prediction accuracy against real outcomes
