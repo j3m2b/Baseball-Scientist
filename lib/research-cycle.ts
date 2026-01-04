@@ -24,6 +24,7 @@ export interface ResearchCycleResult {
   hypothesesCount?: number;
   insightsCount?: number;
   nextExperimentsCount?: number;
+  reflectionsCount?: number;
   error?: string;
 }
 
@@ -226,13 +227,34 @@ export async function runResearchCycle(
       }
     }
 
+    // Insert reflections (True Learning Loop - Phase 1)
+    if (parsed.reflections && parsed.reflections.length > 0) {
+      const reflectionsToInsert = parsed.reflections.map((reflection: any) => ({
+        experiment_id: experimentId,
+        reflection_type: reflection.type,
+        content: reflection.content
+      }));
+
+      const { error: reflectionError } = await supabase
+        .from('reflections')
+        .insert(reflectionsToInsert as any);
+
+      if (reflectionError) {
+        console.error('[ResearchCycle] Failed to insert reflections:', reflectionError);
+        // Don't fail on reflections error, just log it
+      } else {
+        console.log(`[ResearchCycle] Inserted ${parsed.reflections.length} reflections`);
+      }
+    }
+
     return {
       success: true,
       experimentId,
       title: parsed.title,
       hypothesesCount: parsed.hypotheses.length,
       insightsCount: parsed.insights.length,
-      nextExperimentsCount: parsed.nextExperiments?.length || 0
+      nextExperimentsCount: parsed.nextExperiments?.length || 0,
+      reflectionsCount: parsed.reflections?.length || 0
     };
   } catch (error) {
     console.error('[ResearchCycle] Error:', error);

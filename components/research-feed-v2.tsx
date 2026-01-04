@@ -6,8 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatTimeAgo } from '@/lib/utils';
-import { FlaskConical, TrendingUp, LineChart, Clock, Play, AlertCircle, CheckCircle, Sparkles, Zap, Target, Brain } from 'lucide-react';
+import { FlaskConical, TrendingUp, LineChart, Clock, Play, AlertCircle, CheckCircle, Sparkles, Zap, Target, Brain, Lightbulb } from 'lucide-react';
 import { ProbabilityChart } from './probability-chart';
+import { LearningsDisplay } from './learnings-display';
 
 interface Experiment {
   id: string;
@@ -47,12 +48,20 @@ interface NextExperiment {
   description: string;
 }
 
+interface Reflection {
+  id: string;
+  reflection_type: 'learned' | 'bias_identified' | 'adjustment_made';
+  content: string;
+  created_at: string;
+}
+
 interface LatestData {
   experiment: Experiment;
   hypotheses: Hypothesis[];
   insights: Insight[];
   teamProbabilities: TeamProbability[];
   nextExperiments: NextExperiment[];
+  reflections: Reflection[];
 }
 
 export function ResearchFeedV2() {
@@ -88,7 +97,8 @@ export function ResearchFeedV2() {
           hypotheses: data.hypotheses || [],
           insights: data.insights || [],
           teamProbabilities: data.probabilities || [],
-          nextExperiments: []
+          nextExperiments: [],
+          reflections: data.reflections || []
         });
       } else if (data.error && data.error.includes('No experiments found')) {
         setLatestData(null);
@@ -256,7 +266,7 @@ export function ResearchFeedV2() {
     );
   }
 
-  const { experiment, hypotheses, insights, teamProbabilities, nextExperiments } = latestData;
+  const { experiment, hypotheses, insights, teamProbabilities, nextExperiments, reflections } = latestData;
 
   const getSurpriseBadge = (level: 'Low' | 'Medium' | 'High') => {
     switch (level) {
@@ -364,10 +374,14 @@ export function ResearchFeedV2() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Tabs defaultValue="activity" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-flex bg-slate-800/50 border border-blue-500/20 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 lg:w-auto lg:inline-flex bg-slate-800/50 border border-blue-500/20 p-1 rounded-lg">
             <TabsTrigger value="activity" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <Clock className="h-4 w-4" />
               Latest Activity
+            </TabsTrigger>
+            <TabsTrigger value="learnings" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+              <Lightbulb className="h-4 w-4" />
+              What I Learned
             </TabsTrigger>
             <TabsTrigger value="findings" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <Target className="h-4 w-4" />
@@ -424,6 +438,13 @@ export function ResearchFeedV2() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="learnings" className="space-y-4">
+            <LearningsDisplay
+              reflections={reflections}
+              experimentNumber={experiment.experiment_number}
+            />
           </TabsContent>
 
           <TabsContent value="findings" className="space-y-4">
