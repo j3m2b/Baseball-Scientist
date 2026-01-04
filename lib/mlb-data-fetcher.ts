@@ -72,23 +72,28 @@ async function getCuratedMLBData(year: number): Promise<string> {
 
 #### Major Free Agent Signings (2025-2026 Offseason - IN PROGRESS):
 
-**Top Free Agents Still Available:**
-- Juan Soto (OF) - Superstar entering prime, seeking $500M+ deal
-  • Yankees, Mets, Dodgers, Red Sox, Giants all in pursuit
-  • Expected to sign before spring training (February 2026)
+**Top Free Agents Still Available (January 2026):**
 - Corbin Burnes (SP) - Ace pitcher, Cy Young caliber
 - Blake Snell (SP) - Two-time Cy Young winner
 - Cody Bellinger (1B/OF) - Power bat with defensive versatility
 - Matt Chapman (3B) - Gold Glove defender
 - Jordan Montgomery (SP) - Postseason proven starter
+- Anthony Santander (OF) - Power hitter
+- Teoscar Hernández (OF) - Consistent run producer
 
-**Recent Signings (December 2025 - January 2026):**
+**Major Signings Completed (December 2025 - January 2026):**
+- **Juan Soto (OF) to Mets - 15 years, $765M** (record-breaking deal, December 2024)
+  • Largest contract in sports history
+  • Mets beat Yankees, Dodgers, Red Sox in bidding war
+  • Now entering 2nd year with Mets after strong 2025 debut
 - Josh Hader (CP) to Astros - 5 years, $95M (elite closer)
 - Sonny Gray (SP) to Cardinals - 3 years, $75M
 - Aaron Nola (SP) re-signed with Phillies - 7 years, $172M
 - Jung Hoo Lee (CF) to Giants - 6 years, $113M (KBO star)
 - Shota Imanaga (SP) to Cubs - 4 years, $53M (NPB import)
 - Eduardo Rodriguez (SP) to Diamondbacks - 4 years, $80M
+- Max Fried (SP) to Yankees - 8 years, $218M
+- Willy Adames (SS) to Giants - 7 years, $182M
 
 **Relievers Market:**
 - Robert Suarez, Jordan Hicks, Aroldis Chapman still available
@@ -97,11 +102,11 @@ async function getCuratedMLBData(year: number): Promise<string> {
 #### Notable Trades (2025-2026 Offseason):
 
 **Blockbuster Deals:**
-- Juan Soto trade rumors continue - Multiple teams inquiring
 - Tyler Glasnow trade discussions (Rays shopping ace)
 - White Sox fire sale continues - Luis Robert Jr., Dylan Cease available
 - Marlins shopping Jazz Chisholm Jr., Sandy Alcantara
 - Rays considering trading key pieces to reset
+- Garrett Crochet (White Sox SP) drawing significant interest
 
 **Completed Trades:**
 - TBD - Major trades typically happen January-February
@@ -154,7 +159,7 @@ async function getCuratedMLBData(year: number): Promise<string> {
 
 **AL East:**
 - Orioles young core locked in (Henderson, Rutschman, Rodriguez)
-- Yankees pursuing Juan Soto to rebound
+- Yankees rebounding after missing Soto (signed Max Fried instead)
 - Rays always competitive despite trades
 - Blue Jays retooling around Guerrero Jr.
 - Red Sox rebuilding
@@ -174,9 +179,11 @@ async function getCuratedMLBData(year: number): Promise<string> {
 - Angels rebuilding post-Ohtani
 
 **NL East:**
-- Braves elite despite Acuña injury (Freeman, Albies, Riley, Olson)
+- **Mets** - Major players after Soto signing (Lindor, Soto, Alonso, Nimmo)
+  • Steve Cohen's $765M Soto deal changed division
+  • Soto entering 2nd year after strong 2025 debut with Mets
+- Braves elite despite Acuña injury (Acuña, Albies, Riley, Olson, Murphy)
 - Phillies window still open (Harper, Turner, Wheeler, Nola)
-- Mets retooling under Stearns
 - Nationals building around young core
 - Marlins perpetual sellers
 
@@ -212,10 +219,12 @@ async function getCuratedMLBData(year: number): Promise<string> {
 #### Payroll & Luxury Tax Situations:
 
 **Deep in Luxury Tax:**
-- **Dodgers: $370M+** (Ohtani, Yamamoto, Betts, Freeman, Freddie, Roki)
+- **Dodgers: $370M+** (Ohtani, Yamamoto, Betts, Freeman, Roki)
   • Ohtani deferred $680M helps CBT calculation
-- Mets: $350M+ (Cohen spending aggressively)
-- Yankees: $320M+ (Judge, Cole, pursuing Soto)
+- **Mets: $360M+** (Cohen spending - Soto $765M total, Lindor, Verlander)
+  • Soto's AAV ~$51M, highest in baseball
+  • Steve Cohen willing to exceed tax indefinitely
+- Yankees: $310M+ (Judge, Cole, Stanton, added Max Fried)
 - Phillies: $280M (competitive window)
 
 **Room to Spend:**
@@ -254,46 +263,51 @@ async function getCuratedMLBData(year: number): Promise<string> {
 
 #### Vegas Odds & Betting Market (Early January 2026):
 
-**World Series Favorites (Pre-Soto Signing):**
-1. **Dodgers +350** - Overwhelming favorites
-2. Braves +700
-3. Yankees +900 (would improve with Soto)
-4. Phillies +1100
-5. Astros +1200
-6. Orioles +1300
-7. Padres +1400
-8. Rangers +1600
+**World Series Favorites:**
+1. **Dodgers +300** - Overwhelming favorites (Ohtani, Yamamoto, Betts, Roki)
+2. **Mets +650** - Soto addition makes them NL East favorites
+3. Braves +750
+4. Yankees +850 (added Fried after missing Soto)
+5. Phillies +1100
+6. Astros +1200
+7. Orioles +1300
+8. Padres +1400
 
 **Projected Win Totals:**
 - Dodgers: 102.5 (O/U)
+- Mets: 94.5 (O/U) - Up significantly after Soto
 - Braves: 96.5
 - Yankees: 93.5
 - Orioles: 92.5
 
 **Key Betting Storylines:**
-- Juan Soto's destination will shift entire AL East odds
-- Dodgers are historically heavy favorites
-- NL West projected as most lopsided division
+- Dodgers remain overwhelming favorites despite Mets' Soto signing
+- NL East now competitive: Mets vs Braves vs Phillies
+- Yankees slight favorites in AL East after adding Fried
+- NL West projected as most lopsided division (Dodgers dominance)
 
 #### Wild Card Factors for 2026:
 
-1. **Dodgers Dominance**: Unprecedented talent concentration
+1. **Dodgers Dominance**: Unprecedented talent concentration (Ohtani, Betts, Freeman, Yamamoto, Roki)
 2. **Ohtani's Pitching Return**: Game-changer if healthy by June/July
-3. **Juan Soto Signing**: Will reshape division races
+3. **Mets-Soto Impact**: How does Soto's 2nd year in NY affect NL East?
 4. **Roki Sasaki's Sophomore Season**: Avoiding rookie wall, proving 2025 wasn't fluke
 5. **Injury Luck**: Strider, Cole, Acuña health crucial
 6. **White Sox Historically Bad**: Potential record-setting losses
 7. **Young Star Emergence**: Henderson, Witt Jr., Carroll, De La Cruz
 8. **Playoff Format**: Wild card chaos continues
+9. **NL East Arms Race**: Mets, Braves, Phillies all competitive
 
 ---
 
 **IMPORTANT CONTEXT FOR PREDICTIONS:**
-- Roki Sasaki is NOT a free agent variable - he's an established Dodger entering year 2
-- The 2025 season just ended - use those results as your baseline
-- We're analyzing the 2026 season (starts April 2026)
-- Juan Soto is the biggest remaining free agent domino
-- Dodgers have unprecedented superteam assembled
+- **Roki Sasaki** is NOT a free agent - he's an established Dodger entering year 2 (signed Dec 2024)
+- **Juan Soto** is NOT a free agent - he signed 15yr/$765M with Mets (Dec 2024), entering year 2
+- The **2025 season just ended** - use those results as your baseline
+- We're analyzing the **2026 season** (starts April 2026)
+- Current offseason: **2025-2026** (November 2025 - March 2026)
+- Dodgers and Mets have historically massive payrolls
+- Still available free agents: Burnes, Snell, Bellinger, Chapman, Montgomery
 `.trim();
   }
 
