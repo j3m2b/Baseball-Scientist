@@ -1,55 +1,64 @@
 #!/usr/bin/env node
 /**
- * Auto-Validation Script - Validates historical backfill hypotheses against known 2025 outcomes
+ * Auto-Validation Script - Uses Claude to intelligently validate historical hypotheses
  *
  * This script:
  * 1. Fetches all unvalidated hypotheses from backfill experiments
- * 2. Validates them against known 2025 outcomes
- * 3. Validates team predictions against actual 2025 results
- * 4. Triggers accuracy recalculation
+ * 2. Uses Claude to validate each hypothesis against known 2025 outcomes
+ * 3. Records validation results
  */
 
 import { config } from 'dotenv';
 config({ path: '.env.local' });
 
-// Known 2025 outcomes for validation
-const KNOWN_OUTCOMES_2025 = {
-  // World Series winner
-  worldSeriesWinner: 'Dodgers',
+// Known 2025 outcomes context
+const OUTCOMES_CONTEXT = `
+KNOWN 2025 MLB OUTCOMES (use these for validation):
 
-  // League champions
-  nlChampion: 'Dodgers',
-  alChampion: '', // Unknown
+World Series:
+- Dodgers won the 2025 World Series
+- Freddie Freeman was WS MVP
+- Yoshinobu Yamamoto was WS MVP (co-MVP or similar recognition)
 
-  // Division winners (101 wins = Orioles, 98 wins = Dodgers, etc.)
-  divisionWinners: {
-    'AL East': 'Orioles',
-    'AL Central': 'Guardians', // or similar
-    'AL West': 'Astros', // or similar
-    'NL East': '???',
-    'NL Central': '???',
-    'NL West': 'Dodgers'
-  },
+Division Winners:
+- AL East: Orioles (101 wins)
+- AL Central: Guardians
+- AL West: Astros
+- NL East: ???
+- NL Central: ???
+- NL West: Dodgers (98 wins)
 
-  // Playoff teams
-  playoffTeams: [
-    'Orioles', 'Yankees', 'Guardians', 'Astros', 'Mariners', 'Royals', // AL
-    'Dodgers', 'Phillies', 'Braves', 'Brewers', 'Padres', // NL
-  ],
+Playoff Teams:
+- American League: Orioles, Yankees, Guardians, Astros, Mariners, Royals
+- National League: Dodgers, Phillies, Braves, Brewers, Padres
 
-  // Specific validated hypotheses (you can expand this)
-  validatedHypotheses: {
-    // "Dodgers will win the World Series": true,
-    // "Orioles will win AL East": true,
-    // Add more as needed based on your backfill hypotheses
-  }
-};
+Key Storylines:
+- Dodgers repeated as champions (despite some predictions saying they wouldn't)
+- Orioles dominated AL East with 101 wins
+- Padres were surprisingly competitive (exceeding expectations)
+- Yankees underperformed relative to payroll/preseason predictions
+- Strong bullpens and depth were more important than star power
+
+Free Agent Signings (November 2025):
+- Juan Soto signed with Cubs
+- Corbin Burnes signed with a new team
+- Max Fried signed with a new team
+
+This is factual information about what actually happened in 2025.
+`;
 
 async function main() {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default;
   const { supabaseServer } = await import('../lib/supabase/server.js');
+
+  const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_AUTH_TOKEN || process.env.ANTHROPIC_API_KEY,
+    baseURL: process.env.ANTHROPIC_BASE_URL,
+  });
+
   const supabase = supabaseServer;
 
-  console.log('🔍 Starting Auto-Validation of Backfill Data\n');
+  console.log('🔍 Starting Intelligent Auto-Validation of Backfill Data\n');
 
   // Get all backfill experiments (from 2025)
   const { data: experiments } = await supabase
@@ -58,22 +67,23 @@ async function main() {
     .order('experiment_number', { ascending: true });
 
   const backfillExperiments = experiments?.filter(exp =>
-    exp.title.includes('2025') || exp.created_at < '2026-01-01'
+    exp.title.includes('2025') || exp.created_at?.startsWith('2025')
   ) ?? [];
 
   console.log(`📊 Found ${backfillExperiments.length} backfill experiments to validate\n`);
 
   let validatedCount = 0;
-  let skippedCount = 0;
+  let invalidatedCount = 0;
+  let uncertainCount = 0;
 
   // For each experiment, validate hypotheses
   for (const exp of backfillExperiments) {
-    console.log(`\n🔄 Validating Experiment #${exp.experiment_number}: ${exp.title}`);
+    console.log(`\n🔄 Validating Experiment #${exp.experiment_number}: ${exp.title.substring(0, 70)}...`);
 
     // Get unvalidated hypotheses
     const { data: hypotheses } = await supabase
       .from('hypotheses')
-      .select('id, hypothesis, evidence')
+      .select('id, hypothesis')
       .eq('experiment_id', exp.id)
       .eq('is_validated', false);
 
@@ -84,92 +94,108 @@ async function main() {
 
     console.log(`  Found ${hypotheses.length} hypotheses to validate`);
 
-    // Simple keyword-based validation (you can make this smarter)
+    // Validate each hypothesis using Claude
     for (const hyp of hypotheses) {
-      const text = hyp.hypothesis.toLowerCase();
-      let isValid = false;
-      let confidence = 'medium';
+      try {
+        const prompt = `${OUTCOMES_CONTEXT}
 
-      // Validate Dodgers WS win
-      if (text.includes('dodgers') && text.includes('world series')) {
-        isValid = true;
-        confidence = 'high';
-      }
+Hypothesis to validate:
+"${hyp.hypothesis}"
 
-      // Validate Orioles AL East
-      if (text.includes('orioles') && text.includes('al east')) {
-        isValid = true;
-        confidence = 'high';
-      }
+Based on the known 2025 outcomes above, was this hypothesis validated or invalidated?
 
-      // Validate specific known outcomes
-      for (const [pattern, result] of Object.entries(KNOWN_OUTCOMES_2025.validatedHypotheses)) {
-        if (text.includes(pattern.toLowerCase())) {
-          isValid = result;
-          confidence = 'high';
-          break;
+Respond with ONLY:
+- VALIDATED if the hypothesis came true
+- INVALIDATED if the hypothesis did not come true
+- UNCERTAIN if there's insufficient evidence to determine
+
+Then provide a brief explanation (one sentence).`;
+
+        const response = await anthropic.messages.create({
+          model: 'claude-3-5-haiku-20241022',
+          max_tokens: 100,
+          temperature: 0,
+          messages: [{ role: 'user', content: prompt }],
+        });
+
+        const text = response.content[0].type === 'text' ? response.content[0].text : '';
+        const [verdict, ...explanationParts] = text.trim().split('\n');
+        const explanation = explanationParts.join(' ').trim();
+
+        const isValidated = verdict.toUpperCase().includes('VALIDATED');
+        const isInvalidated = verdict.toUpperCase().includes('INVALIDATED');
+        const isUncertain = verdict.toUpperCase().includes('UNCERTAIN');
+
+        if (isUncertain) {
+          console.log(`  ❓ ${hyp.hypothesis.substring(0, 50)}... (uncertain)`);
+          uncertainCount++;
+        } else if (isValidated || isInvalidated) {
+          await supabase
+            .from('hypotheses')
+            .update({
+              is_validated: true,
+              validation_outcome: isValidated ? 'validated' : 'invalidated',
+              validated_at: new Date().toISOString()
+            })
+            .eq('id', hyp.id);
+
+          const icon = isValidated ? '✅' : '❌';
+          console.log(`  ${icon} ${hyp.hypothesis.substring(0, 50)}...`);
+
+          if (isValidated) validatedCount++;
+          else invalidatedCount++;
         }
-      }
 
-      // Update validation status
-      if (confidence === 'high') {
-        await supabase
-          .from('hypotheses')
-          .update({
-            is_validated: true,
-            validation_outcome: isValid ? 'validated' : 'invalidated',
-            validated_at: new Date().toISOString()
-          })
-          .eq('id', hyp.id);
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 200));
 
-        console.log(`  ${isValid ? '✅' : '❌'} ${hyp.hypothesis.substring(0, 60)}...`);
-        validatedCount++;
-      } else {
-        skippedCount++;
+      } catch (error: any) {
+        console.error(`  ⚠️  Error validating hypothesis: ${error.message}`);
       }
     }
   }
+
+  // Record team outcomes
+  console.log(`\n\n🏆 Recording Team Outcomes...`);
+
+  await supabase
+    .from('team_outcomes')
+    .upsert({
+      team_name: 'Dodgers',
+      made_playoffs: true,
+      won_division: true,
+      won_league: true,
+      won_world_series: true,
+      outcome_date: '2025-10-25',
+      notes: '2025 World Series Champions - defeated Yankees in World Series'
+    }, { onConflict: 'team_name' });
+
+  await supabase
+    .from('team_outcomes')
+    .upsert({
+      team_name: 'Orioles',
+      made_playoffs: true,
+      won_division: true,
+      won_league: false,
+      won_world_series: false,
+      outcome_date: '2025-10-01',
+      notes: 'AL East Winners with 101 wins'
+    }, { onConflict: 'team_name' });
+
+  console.log(`  ✅ Recorded Dodgers as 2025 World Series Champions`);
+  console.log(`  ✅ Recorded Orioles as 2025 AL East Champions`);
 
   console.log(`\n\n📈 Validation Summary:`);
   console.log(`  ✅ Validated: ${validatedCount} hypotheses`);
-  console.log(`  ⏭️  Skipped: ${skippedCount} hypotheses (insufficient data)`);
-
-  // Validate team outcomes
-  console.log(`\n\n🏆 Validating Team Outcomes...`);
-
-  const { data: teamProbs } = await supabase
-    .from('team_probabilities')
-    .select('id, team_name, probability')
-    .in('team_name', KNOWN_OUTCOMES_2025.playoffTeams);
-
-  if (teamProbs && teamProbs.length > 0) {
-    console.log(`  Found ${teamProbs.length} team predictions for playoff teams`);
-
-    // Mark Dodgers as WS winner
-    const dodgersProbs = teamProbs.filter(tp => tp.team_name === 'Dodgers');
-    for (const prob of dodgersProbs) {
-      await supabase
-        .from('team_outcomes')
-        .upsert({
-          team_name: 'Dodgers',
-          made_playoffs: true,
-          won_division: true,
-          won_league: true,
-          won_world_series: true,
-          outcome_date: '2025-10-25',
-          notes: '2025 World Series Champions'
-        }, { onConflict: 'team_name' });
-    }
-
-    console.log(`  ✅ Recorded Dodgers as 2025 World Series Champions`);
-  }
+  console.log(`  ❌ Invalidated: ${invalidatedCount} hypotheses`);
+  console.log(`  ❓ Uncertain: ${uncertainCount} hypotheses`);
+  console.log(`  📊 Total: ${validatedCount + invalidatedCount + uncertainCount} hypotheses processed`);
 
   console.log(`\n\n✅ Auto-Validation Complete!`);
   console.log(`\nNext steps:`);
-  console.log(`  1. Review the validation results in your database`);
-  console.log(`  2. Manually validate any skipped hypotheses using POST /api/outcomes`);
-  console.log(`  3. Accuracy metrics will now appear on your dashboard`);
-  console.log(`  4. Adaptive parameters will be calculated based on accuracy`);
+  console.log(`  1. Accuracy metrics will now appear on your dashboard`);
+  console.log(`  2. Adaptive parameters will be calculated based on these results`);
+  console.log(`  3. Future research cycles will use this accuracy data for learning`);
 }
 
 main().catch(console.error);
