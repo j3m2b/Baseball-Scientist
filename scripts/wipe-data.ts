@@ -54,7 +54,7 @@ async function main() {
     if (error) {
       console.error('  Error:', error.message);
     } else {
-      console.log(`  Deleted: ${allExperiments.length} experiments`);
+      console.log(`  Deleted: ${exps.length} experiments`);
     }
   }
 
