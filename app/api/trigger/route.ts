@@ -4,6 +4,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { parseClaudeResponse, TEAM_CODES } from '@/lib/parsers';
+import { getCurrentMLBData } from '@/lib/mlb-data';
 
 // Simple client-friendly trigger endpoint
 // In production, you'd want proper authentication (e.g., Supabase auth, session checks)
@@ -26,33 +27,6 @@ export async function POST(request: NextRequest) {
     });
 
     const systemPrompt = readFileSync(join(process.cwd(), 'claude.code.md'), 'utf-8');
-    const CURRENT_MLB_DATA = `
-### 2025-2026 MLB Offseason Data - January 2026
-
-#### Top Free Agent Signings (Example - UPDATE WITH REAL DATA):
-- [Team] signed [Player] (SP) - 5 years, $125M
-- [Team] signed [Player] (OF) - 3 years, $78M
-- [Team] signed [Player] (RP) - 2 years, $34M
-
-#### Notable Trades (Example - UPDATE WITH REAL DATA):
-- [Team] traded [Player] to [Team] for [Prospects]
-- [Team] acquired [Player] from [Team] for [Players]
-
-#### International Signings (Example - UPDATE WITH REAL DATA):
-- [Team] signed [Japanese/Korean Player] - [Posting fee + contract details]
-- [Team] signed [Latin American prospect] - [Bonus amount]
-
-#### Key Injuries Affecting 2026:
-- [Player] (Team) - Out until [month] with [injury]
-- [Player] (Team) - Recovering from [injury], expected ready for spring training
-
-#### 2025 Performance Context:
-- Teams that overachieved and may regress
-- Teams that underachieved and could bounce back
-- Key prospects expected to debut in 2026
-
-UPDATE THIS DATA WITH REAL MLB OFFSEASON INFORMATION FROM YOUR SOURCES
-`.trim();
 
     // Fetch past cycles for reflection
     const supabase = supabaseServer;
@@ -88,7 +62,10 @@ UPDATE THIS DATA WITH REAL MLB OFFSEASON INFORMATION FROM YOUR SOURCES
       });
     }
 
-    const userPrompt = `${historyContext}\n\n### Current MLB Data:\n${CURRENT_MLB_DATA}\n\nNow run the next research cycle.`;
+    // Fetch current MLB data automatically
+    const currentMLBData = await getCurrentMLBData();
+
+    const userPrompt = `${historyContext}\n\n${currentMLBData}\n\nNow run the next research cycle.`;
 
     console.error('[Trigger] Calling Claude API...');
 
