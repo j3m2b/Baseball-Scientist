@@ -34,7 +34,7 @@ export async function autoValidateHypotheses(
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const { data: hypotheses, error: fetchError } = await supabase
+    const result = await supabase
       .from('hypotheses')
       .select(`
         id,
@@ -53,13 +53,16 @@ export async function autoValidateHypotheses(
       .order('created_at', { ascending: true })
       .limit(maxHypothesesToValidate * 2); // Fetch more, filter later
 
+    const hypotheses = result.data as any[] | null;
+    const fetchError = result.error;
+
     if (fetchError || !hypotheses || hypotheses.length === 0) {
       console.log('[HypothesisValidator] No old hypotheses found for validation');
       return [];
     }
 
     // Filter out hypotheses that already have outcomes
-    const hypothesisIds = (hypotheses as any[]).map((h: any) => h.id);
+    const hypothesisIds = hypotheses.map((h: any) => h.id);
     const { data: existingOutcomes } = await supabase
       .from('prediction_outcomes')
       .select('hypothesis_id')
