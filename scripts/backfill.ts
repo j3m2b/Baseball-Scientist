@@ -249,29 +249,37 @@ Review your previous predictions and what actually happened:
 
   const supabase = supabaseServer;
 
-  // Check current state
-  const { data: existingExps } = await supabase
-    .from('experiments')
-    .select('experiment_number, created_at')
-    .order('experiment_number', { ascending: false })
-    .limit(1);
-
-  const existingExpsData = existingExps as any[] | null;
-  const startingNumber = ((existingExpsData?.[0]?.experiment_number) ?? 0) + 1;
-  console.log(`📊 Starting from experiment #${startingNumber}\n`);
-
-  // Get existing experiments for context
+  // Check current state - get ALL existing experiment numbers
   const { data: allExps } = await supabase
     .from('experiments')
     .select('id, experiment_number, title, summary, created_at')
-    .order('experiment_number', { ascending: false });
+    .order('experiment_number', { ascending: true });
 
   const allExperiments = allExps as any[] | null;
+
+  // Get the set of existing experiment numbers for quick lookup
+  const existingNumbers = new Set((allExperiments ?? []).map((e: any) => e.experiment_number));
+
+  // Find the next available experiment number
+  let nextNumber = 1;
+  while (existingNumbers.has(nextNumber)) {
+    nextNumber++;
+  }
+
+  console.log(`📊 Found ${allExperiments?.length ?? 0} existing experiments`);
+  console.log(`📊 Starting from experiment #${nextNumber}\n`);
+
   const completedCycles: any[] = [];
 
   // Process each snapshot
   for (const snapshot of HISTORICAL_SNAPSHOTS) {
-    const experimentNumber = startingNumber + completedCycles.length;
+    // Find next available experiment number (skip any that exist)
+    let experimentNumber = nextNumber + completedCycles.length;
+    let adjustment = 0;
+    while (existingNumbers.has(experimentNumber + adjustment)) {
+      adjustment++;
+    }
+    experimentNumber += adjustment;
 
     // Run research cycle
     const experimentData = await runResearchCycle(snapshot, experimentNumber, allExperiments ?? []);
@@ -293,6 +301,8 @@ Review your previous predictions and what actually happened:
         summary: experimentData.summary,
         created_at: new Date().toISOString()
       });
+      // Mark this number as used to avoid conflicts
+      existingNumbers.add(experimentNumber);
 
       // Rate limiting to avoid overwhelming the API
       if (completedCycles.length < HISTORICAL_SNAPSHOTS.length) {
