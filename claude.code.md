@@ -61,6 +61,11 @@ When "Previous Research Cycles" are provided:
     <insight>Bullet-style broader observation about offseason trends</insight>
     ... 4-8 insights
   </insights>
+
+  <next_experiments>
+    <next>Future research direction or hypothesis to test in next cycle</next>
+    ... 2-4 planned experiments
+  </next_experiments>
 </experiment>
 
 Respond ONLY with the above structure.

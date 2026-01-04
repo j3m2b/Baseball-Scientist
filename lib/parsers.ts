@@ -87,5 +87,8 @@ export function parseClaudeResponse(text: string) {
   // Parse insights
   const insights = extractRepeatedTags(experimentContent, 'insight');
 
-  return { title, summary, hypotheses, teamProbabilities, insights };
+  // Parse next experiments
+  const nextExperiments = extractRepeatedTags(experimentContent, 'next');
+
+  return { title, summary, hypotheses, teamProbabilities, insights, nextExperiments };
 }
