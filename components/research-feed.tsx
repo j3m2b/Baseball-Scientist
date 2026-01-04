@@ -259,7 +259,7 @@ export function ResearchFeed() {
         <div>
           <h1 className="text-4xl font-bold mb-2">Auto-Baseball-Scientist</h1>
           <p className="text-muted-foreground">
-            Live Research Feed — 2026 MLB Off-Season Analysis
+            Live Research Feed — 2025-2026 Offseason → 2026 Season Analysis
           </p>
         </div>
 
