@@ -66,7 +66,8 @@ async function main() {
     .select('id, experiment_number, title, created_at')
     .order('experiment_number', { ascending: true });
 
-  const backfillExperiments = experiments?.filter(exp =>
+  const exps = experiments as any[] | null;
+  const backfillExperiments = exps?.filter((exp: any) =>
     exp.title.includes('2025') || exp.created_at?.startsWith('2025')
   ) ?? [];
 
@@ -87,15 +88,17 @@ async function main() {
       .eq('experiment_id', exp.id)
       .eq('is_validated', false);
 
-    if (!hypotheses || hypotheses.length === 0) {
+    const hyps = hypotheses as any[] | null;
+
+    if (!hyps || hyps.length === 0) {
       console.log(`  ✓ No unvalidated hypotheses`);
       continue;
     }
 
-    console.log(`  Found ${hypotheses.length} hypotheses to validate`);
+    console.log(`  Found ${hyps.length} hypotheses to validate`);
 
     // Validate each hypothesis using Claude
-    for (const hyp of hypotheses) {
+    for (const hyp of hyps) {
       try {
         const prompt = `${OUTCOMES_CONTEXT}
 
@@ -132,6 +135,7 @@ Then provide a brief explanation (one sentence).`;
         } else if (isValidated || isInvalidated) {
           await supabase
             .from('hypotheses')
+            // @ts-ignore - Supabase type inference issue with dynamic updates
             .update({
               is_validated: true,
               validation_outcome: isValidated ? 'validated' : 'invalidated',
@@ -168,7 +172,7 @@ Then provide a brief explanation (one sentence).`;
       won_world_series: true,
       outcome_date: '2025-10-25',
       notes: '2025 World Series Champions - defeated Yankees in World Series'
-    }, { onConflict: 'team_name' });
+    } as any, { onConflict: 'team_name' });
 
   await supabase
     .from('team_outcomes')
@@ -180,7 +184,7 @@ Then provide a brief explanation (one sentence).`;
       won_world_series: false,
       outcome_date: '2025-10-01',
       notes: 'AL East Winners with 101 wins'
-    }, { onConflict: 'team_name' });
+    } as any, { onConflict: 'team_name' });
 
   console.log(`  ✅ Recorded Dodgers as 2025 World Series Champions`);
   console.log(`  ✅ Recorded Orioles as 2025 AL East Champions`);
