@@ -10,6 +10,7 @@ import { join } from 'path';
 import { parseClaudeResponse, TEAM_CODES } from '@/lib/parsers';
 import { fetchMLBData } from '@/lib/mlb-data-fetcher';
 import { detectPatterns, saveDetectedPatterns, formatPatternsForPrompt } from '@/lib/pattern-analyzer';
+import { calculateAccuracyMetrics, formatAccuracyForPrompt } from '@/lib/accuracy-calculator';
 
 export interface ResearchCycleConfig {
   model?: string;
@@ -106,7 +107,18 @@ export async function runResearchCycle(
       }
     }
 
-    const userPrompt = `${historyContext}${patternsContext}\n\n### Current MLB Data:\n${currentMLBData}\n\nNow run the next research cycle.`;
+    // Phase 3: Calculate accuracy metrics
+    let accuracyContext = '';
+    if (pastExps && pastExps.length >= 3) {
+      console.log('[ResearchCycle] Calculating accuracy metrics...');
+      const accuracyMetrics = await calculateAccuracyMetrics(50);
+      if (accuracyMetrics.total_hypotheses_evaluated > 0 || accuracyMetrics.total_teams_evaluated > 0) {
+        accuracyContext = formatAccuracyForPrompt(accuracyMetrics);
+        console.log(`[ResearchCycle] Accuracy: ${accuracyMetrics.overall_hypothesis_accuracy?.toFixed(1)}% (${accuracyMetrics.total_hypotheses_evaluated} hypotheses evaluated)`);
+      }
+    }
+
+    const userPrompt = `${historyContext}${patternsContext}${accuracyContext}\n\n### Current MLB Data:\n${currentMLBData}\n\nNow run the next research cycle.`;
 
     // Call Claude API with retry logic
     const response = await callClaudeWithRetry(

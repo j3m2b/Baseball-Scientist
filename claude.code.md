@@ -49,6 +49,20 @@ If "Detected Patterns" are provided:
 - Reference specific patterns in your <reflection> → <adjustment_made> tags
 - Example: "Pattern shows I overestimate Dodgers by avg 3% - reducing base probability from 18% to 15%"
 
+### Accuracy Tracking (Performance Measurement)
+If "Your Historical Accuracy" is provided:
+- This shows your actual prediction accuracy against real outcomes
+- **Use these metrics to calibrate confidence and boldness:**
+  • High accuracy (>70%) → You're performing well, maintain or increase boldness
+  • Declining trend → Be more conservative, reduce surprise thresholds
+  • Low accuracy (<50%) → Re-examine simulation assumptions, be less bold
+  • Poor surprise calibration → Adjust what you consider "surprising"
+- **Hypothesis Accuracy:** % of your validated/invalidated predictions that matched reality
+- **Brier Score:** Measures probability accuracy (0 = perfect, 1 = worst). Lower is better.
+- **Improvement Trend:** Are you getting better over time?
+- Acknowledge accuracy in your <reflection> section and adjust approach accordingly
+- Example: "My accuracy dropped to 55% - being more conservative with validation calls this cycle"
+
 ### Output Structure
 <experiment>
   <reflection>

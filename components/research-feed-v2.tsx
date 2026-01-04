@@ -6,10 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatTimeAgo } from '@/lib/utils';
-import { FlaskConical, TrendingUp, LineChart, Clock, Play, AlertCircle, CheckCircle, Sparkles, Zap, Target, Brain, Lightbulb, Activity } from 'lucide-react';
+import { FlaskConical, TrendingUp, LineChart, Clock, Play, AlertCircle, CheckCircle, Sparkles, Zap, Target, Brain, Lightbulb, Activity, BarChart } from 'lucide-react';
 import { ProbabilityChart } from './probability-chart';
 import { LearningsDisplay } from './learnings-display';
 import { PatternsDisplay } from './patterns-display';
+import { AccuracyDisplay } from './accuracy-display';
 
 interface Experiment {
   id: string;
@@ -68,6 +69,21 @@ interface DetectedPattern {
   last_updated_at: string;
 }
 
+interface AccuracyMetrics {
+  overall_hypothesis_accuracy: number | null;
+  total_hypotheses_evaluated: number;
+  correctly_predicted: number;
+  incorrectly_predicted: number;
+  team_probability_brier_score: number | null;
+  total_teams_evaluated: number;
+  surprise_calibration: number | null;
+  high_surprise_total: number;
+  high_surprise_correct: number;
+  improvement_trend: 'improving' | 'stable' | 'declining' | 'insufficient_data';
+  recent_accuracy: number | null;
+  historical_accuracy: number | null;
+}
+
 interface LatestData {
   experiment: Experiment;
   hypotheses: Hypothesis[];
@@ -80,6 +96,7 @@ interface LatestData {
 export function ResearchFeedV2() {
   const [latestData, setLatestData] = useState<LatestData | null>(null);
   const [patterns, setPatterns] = useState<DetectedPattern[]>([]);
+  const [accuracyMetrics, setAccuracyMetrics] = useState<AccuracyMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [triggering, setTriggering] = useState(false);
   const [triggerError, setTriggerError] = useState<string | null>(null);
@@ -91,6 +108,7 @@ export function ResearchFeedV2() {
   useEffect(() => {
     fetchLatestData();
     fetchPatterns();
+    fetchAccuracy();
     subscribeToUpdates();
 
     // Load saved secret if available
@@ -132,6 +150,16 @@ export function ResearchFeedV2() {
       setPatterns(data.patterns || []);
     } catch (error) {
       console.error('Failed to fetch patterns:', error);
+    }
+  }
+
+  async function fetchAccuracy() {
+    try {
+      const response = await fetch('/api/accuracy');
+      const data = await response.json();
+      setAccuracyMetrics(data.metrics || null);
+    } catch (error) {
+      console.error('Failed to fetch accuracy:', error);
     }
   }
 
@@ -399,7 +427,7 @@ export function ResearchFeedV2() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Tabs defaultValue="activity" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 lg:w-auto lg:inline-flex bg-slate-800/50 border border-blue-500/20 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 lg:w-auto lg:inline-flex bg-slate-800/50 border border-blue-500/20 p-1 rounded-lg">
             <TabsTrigger value="activity" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <Clock className="h-4 w-4" />
               Latest Activity
@@ -411,6 +439,10 @@ export function ResearchFeedV2() {
             <TabsTrigger value="patterns" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <Activity className="h-4 w-4" />
               Detected Patterns
+            </TabsTrigger>
+            <TabsTrigger value="accuracy" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+              <BarChart className="h-4 w-4" />
+              Accuracy
             </TabsTrigger>
             <TabsTrigger value="findings" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">
               <Target className="h-4 w-4" />
@@ -478,6 +510,10 @@ export function ResearchFeedV2() {
 
           <TabsContent value="patterns" className="space-y-4">
             <PatternsDisplay patterns={patterns} />
+          </TabsContent>
+
+          <TabsContent value="accuracy" className="space-y-4">
+            <AccuracyDisplay metrics={accuracyMetrics} />
           </TabsContent>
 
           <TabsContent value="findings" className="space-y-4">
