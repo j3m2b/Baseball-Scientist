@@ -65,7 +65,7 @@ export async function autoValidateTeamOutcomes(
     }
 
     // Check which experiments already have outcomes
-    const experimentIds = experimentsWithProbabilities.map(e => e.id);
+    const experimentIds = (experimentsWithProbabilities as any[]).map((e: any) => e.id);
     const { data: existingOutcomes } = await supabase
       .from('probability_accuracy')
       .select('experiment_id, team_code')
@@ -73,7 +73,7 @@ export async function autoValidateTeamOutcomes(
 
     // Build a set of experiment_id + team_code combinations that already have outcomes
     const validatedSet = new Set(
-      existingOutcomes?.map(o => `${o.experiment_id}:${o.team_code}`) || []
+      (existingOutcomes as any[] || []).map((o: any) => `${o.experiment_id}:${o.team_code}`)
     );
 
     // Find experiments that need validation
@@ -86,17 +86,18 @@ export async function autoValidateTeamOutcomes(
     }> = [];
 
     for (const exp of experimentsWithProbabilities) {
-      const teams = (exp as any).team_probabilities;
+      const expData = exp as any;
+      const teams = expData.team_probabilities;
       const unvalidatedTeams = teams.filter(
-        (t: any) => !validatedSet.has(`${exp.id}:${t.team_code}`)
+        (t: any) => !validatedSet.has(`${expData.id}:${t.team_code}`)
       );
 
       if (unvalidatedTeams.length > 0) {
         needsValidation.push({
-          experimentId: exp.id,
-          experimentNumber: exp.experiment_number,
-          experimentTitle: exp.title,
-          experimentDate: new Date(exp.created_at).toLocaleDateString(),
+          experimentId: expData.id,
+          experimentNumber: expData.experiment_number,
+          experimentTitle: expData.title,
+          experimentDate: new Date(expData.created_at).toLocaleDateString(),
           teams: unvalidatedTeams.map((t: any) => ({
             code: t.team_code,
             name: t.team_name,
@@ -162,7 +163,7 @@ export async function autoValidateTeamOutcomes(
                 predicted_probability: outcome.predictedProbability,
                 actual_result: outcome.actualResult,
                 result_date: outcome.resultDate
-              });
+              } as any);
 
             results.push({
               experimentId: exp.experimentId,

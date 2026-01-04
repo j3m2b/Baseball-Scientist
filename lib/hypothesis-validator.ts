@@ -59,14 +59,14 @@ export async function autoValidateHypotheses(
     }
 
     // Filter out hypotheses that already have outcomes
-    const hypothesisIds = hypotheses.map(h => h.id);
+    const hypothesisIds = (hypotheses as any[]).map((h: any) => h.id);
     const { data: existingOutcomes } = await supabase
       .from('prediction_outcomes')
       .select('hypothesis_id')
       .in('hypothesis_id', hypothesisIds);
 
-    const validatedIds = new Set(existingOutcomes?.map(o => o.hypothesis_id) || []);
-    const unvalidatedHypotheses = hypotheses.filter(h => !validatedIds.has(h.id));
+    const validatedIds = new Set((existingOutcomes as any[] || []).map((o: any) => o.hypothesis_id));
+    const unvalidatedHypotheses = (hypotheses as any[]).filter((h: any) => !validatedIds.has(h.id));
 
     if (unvalidatedHypotheses.length === 0) {
       console.log('[HypothesisValidator] All old hypotheses already validated');
@@ -121,7 +121,7 @@ export async function autoValidateHypotheses(
               actual_outcome: parsed.outcome,
               outcome_date: parsed.outcomeDate,
               evidence: parsed.evidence
-            });
+            } as any);
 
           results.push({
             hypothesisId: hyp.id,
@@ -201,7 +201,7 @@ function parseValidationResponse(text: string): { outcome: boolean; outcomeDate:
     const outcomeDate = dateMatch[1];
 
     // Extract EVIDENCE
-    const evidenceMatch = text.match(/EVIDENCE:\s*(.+?)(?:\n\n|\n$|$)/s);
+    const evidenceMatch = text.match(/EVIDENCE:\s*([\s\S]+?)(?:\n\n|\n$|$)/);
     if (!evidenceMatch) return null;
     const evidence = evidenceMatch[1].trim();
 
