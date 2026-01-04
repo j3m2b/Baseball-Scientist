@@ -12,6 +12,7 @@ import { fetchMLBData } from '@/lib/mlb-data-fetcher';
 import { detectPatterns, saveDetectedPatterns, formatPatternsForPrompt } from '@/lib/pattern-analyzer';
 import { calculateAccuracyMetrics, formatAccuracyForPrompt } from '@/lib/accuracy-calculator';
 import { getActiveConfig, calculateAdaptiveConfig, updateActiveConfig, formatAdaptiveConfigForPrompt } from '@/lib/adaptive-config-calculator';
+import { compressHistory, validateContextBudget } from '@/lib/context-optimizer';
 
 export interface ResearchCycleConfig {
   model?: string;
@@ -61,39 +62,18 @@ export async function runResearchCycle(
     // Fetch current MLB data (now using real data!)
     const currentMLBData = await fetchMLBData();
 
-    // Fetch past cycles for reflection
+    // Phase 5: Compressed history with time-tiered detail (scales to 100+ cycles)
     const supabase = supabaseServer;
+    console.log('[ResearchCycle] Compressing history with time-tiered detail...');
+    const { compressed: historyContext, tokenCount: historyTokens, cyclesIncluded, compressionRatio } = await compressHistory(100);
+    console.log(`[ResearchCycle] History: ${cyclesIncluded} cycles compressed to ${historyTokens} tokens (${compressionRatio} compression)`);
+
+    // Get past experiments for other phases (need IDs)
     const { data: pastExps } = await supabase
       .from('experiments')
-      .select('id, created_at, title, summary')
-      .order('created_at', { ascending: false })
-      .limit(finalConfig.pastCyclesToFetch);
-
-    const expIds = pastExps?.map((e: any) => e.id) || [];
-
-    const { data: pastHyps } = await supabase
-      .from('hypotheses')
-      .select('hypothesis, is_validated, surprise_level, experiment_id')
-      .in('experiment_id', expIds);
-
-    const { data: pastProbs } = await supabase
-      .from('team_probabilities')
-      .select('team_name, probability, experiment_id')
-      .in('experiment_id', expIds);
-
-    // Format history context for reflection
-    let historyContext = 'No previous research cycles yet.';
-    if (pastExps && pastExps.length > 0) {
-      historyContext = '### Previous Research Cycles (for reflection only):\n\n';
-      pastExps.forEach((exp: any, i: number) => {
-        const hyps = pastHyps?.filter((h: any) => h.experiment_id === exp.id) || [];
-        const probs = pastProbs?.filter((p: any) => p.experiment_id === exp.id).slice(0, 6) || [];
-        historyContext += `Cycle ${pastExps.length - i} (${new Date(exp.created_at).toLocaleDateString()}):\n`;
-        historyContext += `${exp.title}\n${exp.summary}\n`;
-        historyContext += `Key Hypotheses: ${hyps.map((h: any) => `${h.hypothesis} (${h.is_validated ? '✓' : '✗'}, Surprise ${h.surprise_level})`).join('; ') || 'None'}\n`;
-        historyContext += `Top Teams: ${probs.map((p: any) => `${p.team_name} ${p.probability}%`).join(', ') || 'None'}\n\n`;
-      });
-    }
+      .select('id, experiment_number')
+      .order('experiment_number', { ascending: false })
+      .limit(50); // Enough for patterns/accuracy calculations
 
     // Phase 2: Detect patterns in past predictions
     let patternsContext = '';
@@ -138,6 +118,27 @@ export async function runResearchCycle(
     }
 
     const userPrompt = `${historyContext}${patternsContext}${accuracyContext}${adaptiveConfigContext}\n\n### Current MLB Data:\n${currentMLBData}\n\nNow run the next research cycle.`;
+
+    // Validate context budget before calling API (Phase 5)
+    const budgetCheck = validateContextBudget({
+      systemPrompt,
+      history: historyContext,
+      patterns: patternsContext,
+      accuracy: accuracyContext,
+      adaptiveConfig: adaptiveConfigContext,
+      mlbData: currentMLBData
+    });
+
+    console.log(`[ResearchCycle] Context Budget: ${budgetCheck.totalTokens} tokens (target: 50K, limit: 150K)`);
+    console.log(`[ResearchCycle] Breakdown: System=${budgetCheck.breakdown.systemPrompt}, History=${budgetCheck.breakdown.history}, Patterns=${budgetCheck.breakdown.patterns}, Accuracy=${budgetCheck.breakdown.accuracy}, Config=${budgetCheck.breakdown.adaptiveConfig}, MLB=${budgetCheck.breakdown.mlbData}`);
+
+    if (budgetCheck.warning) {
+      console.warn(`[ResearchCycle] Context Warning: ${budgetCheck.warning}`);
+    }
+
+    if (!budgetCheck.isValid) {
+      return { success: false, error: budgetCheck.warning || 'Context exceeds maximum token budget' };
+    }
 
     // Call Claude API with retry logic
     const response = await callClaudeWithRetry(
