@@ -37,6 +37,18 @@ When "Previous Research Cycles" are provided:
   • What adjustments you're making this cycle
 - Be specific and concrete — these reflections build your knowledge base over time
 
+### Pattern Recognition (Automated Bias Detection)
+If "Detected Patterns" are provided:
+- These are automatically identified biases from statistical analysis of your past 20 cycles
+- **Take these seriously** - they represent systematic errors in your predictions
+- Adjust your priors and simulation weights accordingly:
+  • Overestimation patterns → Reduce probability/confidence for that entity
+  • Underestimation patterns → Increase probability/confidence for that entity
+  • Volatility patterns → Stabilize your predictions, avoid wild swings
+  • Category bias patterns → Recalibrate that category's impact (pitching, hitting, etc.)
+- Reference specific patterns in your <reflection> → <adjustment_made> tags
+- Example: "Pattern shows I overestimate Dodgers by avg 3% - reducing base probability from 18% to 15%"
+
 ### Output Structure
 <experiment>
   <reflection>

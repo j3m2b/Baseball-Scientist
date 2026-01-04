@@ -9,6 +9,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { parseClaudeResponse, TEAM_CODES } from '@/lib/parsers';
 import { fetchMLBData } from '@/lib/mlb-data-fetcher';
+import { detectPatterns, saveDetectedPatterns, formatPatternsForPrompt } from '@/lib/pattern-analyzer';
 
 export interface ResearchCycleConfig {
   model?: string;
@@ -92,7 +93,20 @@ export async function runResearchCycle(
       });
     }
 
-    const userPrompt = `${historyContext}\n\n### Current MLB Data:\n${currentMLBData}\n\nNow run the next research cycle.`;
+    // Phase 2: Detect patterns in past predictions
+    let patternsContext = '';
+    if (pastExps && pastExps.length >= 5) {
+      console.log('[ResearchCycle] Detecting patterns in past cycles...');
+      const detectedPatterns = await detectPatterns(20);
+      if (detectedPatterns.length > 0) {
+        patternsContext = '\n\n' + formatPatternsForPrompt(detectedPatterns);
+        // Save detected patterns to database
+        await saveDetectedPatterns(detectedPatterns);
+        console.log(`[ResearchCycle] Detected ${detectedPatterns.length} patterns`);
+      }
+    }
+
+    const userPrompt = `${historyContext}${patternsContext}\n\n### Current MLB Data:\n${currentMLBData}\n\nNow run the next research cycle.`;
 
     // Call Claude API with retry logic
     const response = await callClaudeWithRetry(
