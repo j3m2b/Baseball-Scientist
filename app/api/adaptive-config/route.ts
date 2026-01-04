@@ -60,37 +60,3 @@ export async function POST() {
     );
   }
 }
-
-/**
- * GET /api/adaptive-config/history
- * Fetches configuration history to see how parameters evolved
- */
-export async function GET_HISTORY() {
-  try {
-    const supabase = supabaseServer;
-
-    const { data: history, error } = await supabase
-      .from('config_history')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20);
-
-    if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      history: history || [],
-      count: history?.length || 0
-    });
-  } catch (error) {
-    console.error('[API /adaptive-config/history] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch configuration history' },
-      { status: 500 }
-    );
-  }
-}
