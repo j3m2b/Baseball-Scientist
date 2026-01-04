@@ -28,7 +28,9 @@ export async function fetchMLBData(): Promise<string> {
 }
 
 /**
- * Curated MLB data for 2025-2026 offseason
+ * Curated MLB data for CURRENT 2025-2026 offseason
+ * Date: January 3, 2026 - Analyzing moves for upcoming 2026 season
+ *
  * This should be regularly updated with real transactions
  *
  * TODO: Replace with automated API calls to:
@@ -37,12 +39,13 @@ export async function fetchMLBData(): Promise<string> {
  * - Sports betting APIs for live odds
  */
 async function getCuratedMLBData(year: number): Promise<string> {
-  // For 2025-2026 offseason leading into 2026 season
-  if (year === 2026 || year === 2025) {
+  // For CURRENT 2025-2026 offseason (January 2026)
+  if (year === 2026) {
     return `
-### 2025-2026 MLB Offseason Data - Updated ${new Date().toLocaleDateString()}
+### 2025-2026 MLB Offseason Analysis - January 3, 2026
+### Analyzing Impact on Upcoming 2026 Season
 
-#### Major Free Agent Signings:
+#### Major Free Agent Signings (Completed):
 
 **Starting Pitchers:**
 - Blake Snell to Dodgers - 5 years, $182M (reportedly finalized late 2025)
