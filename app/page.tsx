@@ -1,5 +1,5 @@
-import { ResearchFeed } from '@/components/research-feed';
+import { ResearchFeedV2 } from '@/components/research-feed-v2';
 
 export default function Home() {
-  return <ResearchFeed />;
+  return <ResearchFeedV2 />;
 }

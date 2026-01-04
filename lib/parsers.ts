@@ -87,5 +87,20 @@ export function parseClaudeResponse(text: string) {
   // Parse insights
   const insights = extractRepeatedTags(experimentContent, 'insight');
 
-  return { title, summary, hypotheses, teamProbabilities, insights };
+  // Parse next experiments
+  const nextExperiments = extractRepeatedTags(experimentContent, 'next');
+
+  // Parse reflections (True Learning Loop - Phase 1)
+  const reflectionContent = extractTagContent(experimentContent, 'reflection');
+  const learned = extractRepeatedTags(reflectionContent, 'learned');
+  const biasesIdentified = extractRepeatedTags(reflectionContent, 'bias_identified');
+  const adjustmentsMade = extractRepeatedTags(reflectionContent, 'adjustment_made');
+
+  const reflections = [
+    ...learned.map(content => ({ type: 'learned' as const, content })),
+    ...biasesIdentified.map(content => ({ type: 'bias_identified' as const, content })),
+    ...adjustmentsMade.map(content => ({ type: 'adjustment_made' as const, content }))
+  ];
+
+  return { title, summary, hypotheses, teamProbabilities, insights, nextExperiments, reflections };
 }

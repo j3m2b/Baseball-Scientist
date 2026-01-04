@@ -40,10 +40,17 @@ export async function GET() {
     .select('*')
     .eq('experiment_id', experimentId);
 
+  const { data: reflections } = await supabase
+    .from('reflections')
+    .select('*')
+    .eq('experiment_id', experimentId)
+    .order('created_at', { ascending: true });
+
   return NextResponse.json({
     experiment: experiment,
     hypotheses: hypotheses || [],
     insights: insights || [],
     probabilities: probabilities || [],
+    reflections: reflections || [],
   });
 }
