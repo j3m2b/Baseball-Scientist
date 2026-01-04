@@ -35,12 +35,13 @@ async function main() {
   console.log('🗑️  Fetching all records to delete...');
 
   const { data: allExperiments } = await supabase.from('experiments').select('id');
+  const exps = allExperiments as any[] | null;
 
-  if (allExperiments && allExperiments.length > 0) {
-    console.log(`Found ${allExperiments.length} experiments, deleting related records...`);
+  if (exps && exps.length > 0) {
+    console.log(`Found ${exps.length} experiments, deleting related records...`);
 
     // Delete child records for each experiment
-    for (const exp of allExperiments) {
+    for (const exp of exps) {
       await supabase.from('hypotheses').delete().eq('experiment_id', exp.id);
       await supabase.from('team_probabilities').delete().eq('experiment_id', exp.id);
       await supabase.from('insights').delete().eq('experiment_id', exp.id);
@@ -48,7 +49,7 @@ async function main() {
     }
 
     console.log('🗑️  Deleting experiments...');
-    const { error } = await supabase.from('experiments').delete().in('id', allExperiments.map(e => e.id));
+    const { error } = await supabase.from('experiments').delete().in('id', exps.map(e => e.id));
 
     if (error) {
       console.error('  Error:', error.message);
