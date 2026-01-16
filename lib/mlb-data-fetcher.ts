@@ -3,6 +3,8 @@
  * Uses multiple sources to build context for Claude research cycles
  */
 
+import { getPlayerStatsForResearch } from './player-stats-loader';
+
 export interface MLBDataSources {
   freeAgents: string;
   trades: string;
@@ -19,12 +21,32 @@ export async function fetchMLBData(): Promise<string> {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
 
-  // Try to fetch from MLB Stats API and other sources
-  // For now, we'll use curated data with real offseason information
-
+  // Get curated offseason data
   const mlbData = await getCuratedMLBData(year);
 
-  return mlbData;
+  // Fetch live player stats (batters and pitchers)
+  console.log('[MLBDataFetcher] Loading live player statistics...');
+  try {
+    const playerStats = await getPlayerStatsForResearch([
+      143, // Phillies
+      147, // Yankees
+      119, // Dodgers
+      144, // Braves
+      110, // Orioles
+      117, // Astros
+      133, // Athletics
+      158, // Brewers
+      111, // Red Sox
+      145, // White Sox
+    ]);
+
+    // Append player stats to the main data
+    return mlbData + '\n\n' + playerStats;
+  } catch (error) {
+    console.error('[MLBDataFetcher] Failed to load player stats:', error);
+    // Return just the curated data if player stats fail
+    return mlbData;
+  }
 }
 
 /**
